@@ -1,0 +1,6 @@
+# Im Repository immer LF. Sonst wandern Windows-Zeilenenden in Dateien, die
+# später auf dem Linux-Server landen.
+* text=auto eol=lf
+
+# Binär — nie anfassen.
+*.png binary

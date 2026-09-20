@@ -1,0 +1,9 @@
+node_modules
+dist
+dist.zip
+.env
+.env.local
+*.local
+.DS_Store
+*.tsbuildinfo
+kartei-dist.tar.gz

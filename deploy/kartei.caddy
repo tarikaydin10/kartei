@@ -1,0 +1,51 @@
+# Nach /srv/edge/conf.d/kartei.caddy kopieren (Variante B) bzw. nach
+# /etc/caddy/conf.d/ (Variante A). Siehe deploy/README.md.
+#
+# Kartei ist (noch) rein statisch — es läuft kein Prozess dafür. Caddy liefert
+# die Dateien direkt aus, ein Deploy ist ein Symlink-Wechsel. Kein Container,
+# kein Neustart, kein Reload.
+#
+# Eigene Subdomain, kein Unterordner: das Manifest hat `start_url: "/"` und
+# `scope: "/"`, und der Service Worker beansprucht die ganze Origin.
+
+kartei.klick-profi.de {
+	encode zstd gzip
+
+	root * /srv/static/kartei/current
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+
+	# Die Dateinamen unter /assets/ tragen einen Inhalts-Hash. Ändert sich der
+	# Inhalt, ändert sich der Name — sie dürfen deshalb ewig im Cache liegen.
+	@immutable path /assets/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Die Einstiegspunkte dagegen immer revalidieren. Ein lange gecachter
+	# Service Worker ist der klassische Weg, auf einer alten Version
+	# festzuhängen, obwohl längst eine neue deployt ist.
+	@entry path / /index.html /sw.js /registerSW.js /manifest.webmanifest
+	header @entry Cache-Control "no-cache"
+
+	# Wenn der Sync-Server kommt, kommt er hierhin — gleiche Origin, kein CORS,
+	# dieselbe URL. Dieser Block muss VOR dem catch-all `handle` stehen.
+	#
+	# handle /api/* {
+	# 	reverse_proxy kartei-sync:8788
+	# }
+
+	handle {
+		# Eine Single-Page-App: unbekannte Pfade liefern index.html, damit ein
+		# Reload auf einer Unterseite nicht 404 gibt.
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output discard
+	}
+}

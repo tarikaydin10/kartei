@@ -1,0 +1,2207 @@
+{
+ "format": "kartei",
+ "schemaVersion": 1,
+ "exportedAt": 1789862400000,
+ "app": "kartei-starter",
+ "includesProgress": false,
+ "decks": [
+  {
+   "id": "kartei-starter-ru",
+   "createdAt": 1767225600000,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "name": "Russisch Grundwortschatz",
+   "emoji": "🇷🇺",
+   "noteTypeId": "ru-vocab",
+   "newPerDay": 0,
+   "sortOrder": 0
+  }
+ ],
+ "notes": [
+  {
+   "id": "kartei-starter-ru-0001",
+   "createdAt": 1767225600000,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "да",
+    "de": "ja",
+    "grammatik": "",
+    "beispielRu": "Да, коне́чно.",
+    "beispielDe": "Ja, natürlich.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0002",
+   "createdAt": 1767225600001,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "нет",
+    "de": "nein",
+    "grammatik": "",
+    "beispielRu": "Нет, спаси́бо.",
+    "beispielDe": "Nein, danke.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0003",
+   "createdAt": 1767225600002,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "приве́т",
+    "de": "hallo",
+    "grammatik": "umgangssprachlich",
+    "beispielRu": "Приве́т, как дела́?",
+    "beispielDe": "Hallo, wie geht's?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0004",
+   "createdAt": 1767225600003,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "спаси́бо",
+    "de": "danke",
+    "grammatik": "",
+    "beispielRu": "Спаси́бо большо́е!",
+    "beispielDe": "Vielen Dank!",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0005",
+   "createdAt": 1767225600004,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "пожа́луйста",
+    "de": "bitte",
+    "grammatik": "auch als Antwort auf „danke“",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0006",
+   "createdAt": 1767225600005,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "извини́те",
+    "de": "entschuldigen Sie",
+    "grammatik": "förmlich; du-Form: извини́",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0007",
+   "createdAt": 1767225600006,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "здра́вствуйте",
+    "de": "guten Tag",
+    "grammatik": "förmlich",
+    "beispielRu": "Здра́вствуйте, меня́ зову́т А́нна.",
+    "beispielDe": "Guten Tag, ich heiße Anna.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0008",
+   "createdAt": 1767225600007,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "до свида́ния",
+    "de": "auf Wiedersehen",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0009",
+   "createdAt": 1767225600008,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "я",
+    "de": "ich",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0010",
+   "createdAt": 1767225600009,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ты",
+    "de": "du",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0011",
+   "createdAt": 1767225600010,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "он",
+    "de": "er",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0012",
+   "createdAt": 1767225600011,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "она́",
+    "de": "sie",
+    "grammatik": "Singular",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0013",
+   "createdAt": 1767225600012,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "мы",
+    "de": "wir",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0014",
+   "createdAt": 1767225600013,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "вы",
+    "de": "ihr|Sie",
+    "grammatik": "Plural und Höflichkeitsform",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0015",
+   "createdAt": 1767225600014,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "они́",
+    "de": "sie",
+    "grammatik": "Plural",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0016",
+   "createdAt": 1767225600015,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "челове́к",
+    "de": "Mensch",
+    "grammatik": "m., Pl. лю́ди",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0017",
+   "createdAt": 1767225600016,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "же́нщина",
+    "de": "Frau",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0018",
+   "createdAt": 1767225600017,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "мужчи́на",
+    "de": "Mann",
+    "grammatik": "m., dekliniert wie ein Femininum",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0019",
+   "createdAt": 1767225600018,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ребёнок",
+    "de": "Kind",
+    "grammatik": "m., Pl. де́ти",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0020",
+   "createdAt": 1767225600019,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "друг",
+    "de": "Freund",
+    "grammatik": "m., Pl. друзья́",
+    "beispielRu": "Он мой друг.",
+    "beispielDe": "Er ist mein Freund.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0021",
+   "createdAt": 1767225600020,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "семья́",
+    "de": "Familie",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0022",
+   "createdAt": 1767225600021,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "мать",
+    "de": "Mutter",
+    "grammatik": "f., Gen. ма́тери",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0023",
+   "createdAt": 1767225600022,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "оте́ц",
+    "de": "Vater",
+    "grammatik": "m., Gen. отца́",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0024",
+   "createdAt": 1767225600023,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "сын",
+    "de": "Sohn",
+    "grammatik": "m., Pl. сыновья́",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0025",
+   "createdAt": 1767225600024,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "дочь",
+    "de": "Tochter",
+    "grammatik": "f., Gen. до́чери",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0026",
+   "createdAt": 1767225600025,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "дом",
+    "de": "Haus",
+    "grammatik": "m., Pl. дома́",
+    "beispielRu": "Э́то наш дом.",
+    "beispielDe": "Das ist unser Haus.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0027",
+   "createdAt": 1767225600026,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "кварти́ра",
+    "de": "Wohnung",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0028",
+   "createdAt": 1767225600027,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ко́мната",
+    "de": "Zimmer",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0029",
+   "createdAt": 1767225600028,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "стол",
+    "de": "Tisch",
+    "grammatik": "m., Gen. стола́",
+    "beispielRu": "Кни́га на столе́.",
+    "beispielDe": "Das Buch liegt auf dem Tisch.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0030",
+   "createdAt": 1767225600029,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "стул",
+    "de": "Stuhl",
+    "grammatik": "m., Pl. сту́лья",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0031",
+   "createdAt": 1767225600030,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "окно́",
+    "de": "Fenster",
+    "grammatik": "n., Pl. о́кна",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0032",
+   "createdAt": 1767225600031,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "дверь",
+    "de": "Tür",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0033",
+   "createdAt": 1767225600032,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "кни́га",
+    "de": "Buch",
+    "grammatik": "f.",
+    "beispielRu": "Э́то интере́сная кни́га.",
+    "beispielDe": "Das ist ein interessantes Buch.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0034",
+   "createdAt": 1767225600033,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "вода́",
+    "de": "Wasser",
+    "grammatik": "f., Akk. во́ду",
+    "beispielRu": "Да́йте, пожа́луйста, во́ду.",
+    "beispielDe": "Geben Sie mir bitte Wasser.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0035",
+   "createdAt": 1767225600034,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "хлеб",
+    "de": "Brot",
+    "grammatik": "m.",
+    "beispielRu": "Я купи́л хлеб.",
+    "beispielDe": "Ich habe Brot gekauft.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0036",
+   "createdAt": 1767225600035,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "чай",
+    "de": "Tee",
+    "grammatik": "m.",
+    "beispielRu": "Я пью чай ка́ждое у́тро.",
+    "beispielDe": "Ich trinke jeden Morgen Tee.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0037",
+   "createdAt": 1767225600036,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ко́фе",
+    "de": "Kaffee",
+    "grammatik": "m., unveränderlich",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0038",
+   "createdAt": 1767225600037,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "молоко́",
+    "de": "Milch",
+    "grammatik": "n.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0039",
+   "createdAt": 1767225600038,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "я́блоко",
+    "de": "Apfel",
+    "grammatik": "n., Pl. я́блоки",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0040",
+   "createdAt": 1767225600039,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "мя́со",
+    "de": "Fleisch",
+    "grammatik": "n.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0041",
+   "createdAt": 1767225600040,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "суп",
+    "de": "Suppe",
+    "grammatik": "m.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0042",
+   "createdAt": 1767225600041,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "соль",
+    "de": "Salz",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0043",
+   "createdAt": 1767225600042,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "го́род",
+    "de": "Stadt",
+    "grammatik": "m., Pl. города́",
+    "beispielRu": "Мой го́род о́чень краси́вый.",
+    "beispielDe": "Meine Stadt ist sehr schön.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0044",
+   "createdAt": 1767225600043,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "у́лица",
+    "de": "Straße",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0045",
+   "createdAt": 1767225600044,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "маши́на",
+    "de": "Auto",
+    "grammatik": "f.",
+    "beispielRu": "Э́то моя́ маши́на.",
+    "beispielDe": "Das ist mein Auto.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0046",
+   "createdAt": 1767225600045,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "по́езд",
+    "de": "Zug",
+    "grammatik": "m., Pl. поезда́",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0047",
+   "createdAt": 1767225600046,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "рабо́та",
+    "de": "Arbeit",
+    "grammatik": "f.",
+    "beispielRu": "Я иду́ на рабо́ту.",
+    "beispielDe": "Ich gehe zur Arbeit.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0048",
+   "createdAt": 1767225600047,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "шко́ла",
+    "de": "Schule",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0049",
+   "createdAt": 1767225600048,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "де́ньги",
+    "de": "Geld",
+    "grammatik": "nur Plural, Gen. де́нег",
+    "beispielRu": "У меня́ нет де́нег.",
+    "beispielDe": "Ich habe kein Geld.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0050",
+   "createdAt": 1767225600049,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "вре́мя",
+    "de": "Zeit",
+    "grammatik": "n., Gen. вре́мени",
+    "beispielRu": "У меня́ нет вре́мени.",
+    "beispielDe": "Ich habe keine Zeit.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0051",
+   "createdAt": 1767225600050,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "день",
+    "de": "Tag",
+    "grammatik": "m., Gen. дня",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0052",
+   "createdAt": 1767225600051,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ночь",
+    "de": "Nacht",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0053",
+   "createdAt": 1767225600052,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "у́тро",
+    "de": "Morgen",
+    "grammatik": "n.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0054",
+   "createdAt": 1767225600053,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ве́чер",
+    "de": "Abend",
+    "grammatik": "m.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0055",
+   "createdAt": 1767225600054,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "год",
+    "de": "Jahr",
+    "grammatik": "m., Pl. го́ды",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0056",
+   "createdAt": 1767225600055,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "неде́ля",
+    "de": "Woche",
+    "grammatik": "f.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0057",
+   "createdAt": 1767225600056,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ме́сяц",
+    "de": "Monat",
+    "grammatik": "m.",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0058",
+   "createdAt": 1767225600057,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "сего́дня",
+    "de": "heute",
+    "grammatik": "",
+    "beispielRu": "Сего́дня хоро́шая пого́да.",
+    "beispielDe": "Heute ist gutes Wetter.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0059",
+   "createdAt": 1767225600058,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "вчера́",
+    "de": "gestern",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0060",
+   "createdAt": 1767225600059,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "за́втра",
+    "de": "morgen",
+    "grammatik": "Zeitangabe, nicht die Tageszeit",
+    "beispielRu": "До за́втра!",
+    "beispielDe": "Bis morgen!",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0061",
+   "createdAt": 1767225600060,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "сейча́с",
+    "de": "jetzt",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0062",
+   "createdAt": 1767225600061,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "всегда́",
+    "de": "immer",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0063",
+   "createdAt": 1767225600062,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "никогда́",
+    "de": "nie",
+    "grammatik": "doppelte Negation: никогда́ не",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0064",
+   "createdAt": 1767225600063,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ча́сто",
+    "de": "oft",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0065",
+   "createdAt": 1767225600064,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "хорошо́",
+    "de": "gut",
+    "grammatik": "Adverb",
+    "beispielRu": "Всё хорошо́.",
+    "beispielDe": "Alles gut.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0066",
+   "createdAt": 1767225600065,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "пло́хо",
+    "de": "schlecht",
+    "grammatik": "Adverb",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0067",
+   "createdAt": 1767225600066,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "большо́й",
+    "de": "groß",
+    "grammatik": "Adjektiv",
+    "beispielRu": "Э́то большо́й го́род.",
+    "beispielDe": "Das ist eine große Stadt.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0068",
+   "createdAt": 1767225600067,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ма́ленький",
+    "de": "klein",
+    "grammatik": "Adjektiv",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0069",
+   "createdAt": 1767225600068,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "но́вый",
+    "de": "neu",
+    "grammatik": "Adjektiv",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0070",
+   "createdAt": 1767225600069,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ста́рый",
+    "de": "alt",
+    "grammatik": "Adjektiv",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0071",
+   "createdAt": 1767225600070,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "краси́вый",
+    "de": "schön",
+    "grammatik": "Adjektiv",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0072",
+   "createdAt": 1767225600071,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "до́брый",
+    "de": "gütig|gut",
+    "grammatik": "Adjektiv, vom Charakter",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0073",
+   "createdAt": 1767225600072,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "бы́стро",
+    "de": "schnell",
+    "grammatik": "Adverb",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0074",
+   "createdAt": 1767225600073,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ме́дленно",
+    "de": "langsam",
+    "grammatik": "Adverb",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0075",
+   "createdAt": 1767225600074,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "быть",
+    "de": "sein",
+    "grammatik": "unvollendet; Präsens entfällt meist",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0076",
+   "createdAt": 1767225600075,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "де́лать",
+    "de": "machen|tun",
+    "grammatik": "unv., vollendet: сде́лать",
+    "beispielRu": "Что ты де́лаешь?",
+    "beispielDe": "Was machst du?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0077",
+   "createdAt": 1767225600076,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "говори́ть",
+    "de": "sprechen|sagen",
+    "grammatik": "unv., vollendet: сказа́ть",
+    "beispielRu": "Я говорю́ по-ру́сски.",
+    "beispielDe": "Ich spreche Russisch.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0078",
+   "createdAt": 1767225600077,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "знать",
+    "de": "wissen|kennen",
+    "grammatik": "unvollendet",
+    "beispielRu": "Я не зна́ю.",
+    "beispielDe": "Ich weiß nicht.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0079",
+   "createdAt": 1767225600078,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ду́мать",
+    "de": "denken",
+    "grammatik": "unv., vollendet: поду́мать",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0080",
+   "createdAt": 1767225600079,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "хоте́ть",
+    "de": "wollen|möchten",
+    "grammatik": "unvollendet",
+    "beispielRu": "Я хочу́ есть.",
+    "beispielDe": "Ich möchte essen.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0081",
+   "createdAt": 1767225600080,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "мочь",
+    "de": "können",
+    "grammatik": "unv., vollendet: смочь",
+    "beispielRu": "Я не могу́.",
+    "beispielDe": "Ich kann nicht.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0082",
+   "createdAt": 1767225600081,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "идти́",
+    "de": "gehen",
+    "grammatik": "unv., zu Fuß, zielgerichtet",
+    "beispielRu": "Куда́ ты идёшь?",
+    "beispielDe": "Wohin gehst du?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0083",
+   "createdAt": 1767225600082,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "е́хать",
+    "de": "fahren",
+    "grammatik": "unv., mit Fahrzeug",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0084",
+   "createdAt": 1767225600083,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ви́деть",
+    "de": "sehen",
+    "grammatik": "unv., vollendet: уви́деть",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0085",
+   "createdAt": 1767225600084,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "слы́шать",
+    "de": "hören",
+    "grammatik": "unv., vollendet: услы́шать",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0086",
+   "createdAt": 1767225600085,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "чита́ть",
+    "de": "lesen",
+    "grammatik": "unv., vollendet: прочита́ть",
+    "beispielRu": "Она́ чита́ет кни́гу.",
+    "beispielDe": "Sie liest ein Buch.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0087",
+   "createdAt": 1767225600086,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "писа́ть",
+    "de": "schreiben",
+    "grammatik": "unv., vollendet: написа́ть",
+    "beispielRu": "Он пи́шет письмо́.",
+    "beispielDe": "Er schreibt einen Brief.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0088",
+   "createdAt": 1767225600087,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "рабо́тать",
+    "de": "arbeiten",
+    "grammatik": "unvollendet",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0089",
+   "createdAt": 1767225600088,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "жить",
+    "de": "leben|wohnen",
+    "grammatik": "unvollendet",
+    "beispielRu": "Я живу́ в Гамбу́рге.",
+    "beispielDe": "Ich wohne in Hamburg.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0090",
+   "createdAt": 1767225600089,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "есть",
+    "de": "essen",
+    "grammatik": "unv.; bedeutet auch „es gibt“",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0091",
+   "createdAt": 1767225600090,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "пить",
+    "de": "trinken",
+    "grammatik": "unv., vollendet: вы́пить",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0092",
+   "createdAt": 1767225600091,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "спать",
+    "de": "schlafen",
+    "grammatik": "unvollendet",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0093",
+   "createdAt": 1767225600092,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "люби́ть",
+    "de": "lieben|mögen",
+    "grammatik": "unvollendet",
+    "beispielRu": "Я тебя́ люблю́.",
+    "beispielDe": "Ich liebe dich.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0094",
+   "createdAt": 1767225600093,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "понима́ть",
+    "de": "verstehen",
+    "grammatik": "unv., vollendet: поня́ть",
+    "beispielRu": "Я не понима́ю.",
+    "beispielDe": "Ich verstehe nicht.",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0095",
+   "createdAt": 1767225600094,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "изуча́ть",
+    "de": "lernen|studieren",
+    "grammatik": "unv., vollendet: изучи́ть",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0096",
+   "createdAt": 1767225600095,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "покупа́ть",
+    "de": "kaufen",
+    "grammatik": "unv., vollendet: купи́ть",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0097",
+   "createdAt": 1767225600096,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "дава́ть",
+    "de": "geben",
+    "grammatik": "unv., vollendet: дать",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0098",
+   "createdAt": 1767225600097,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "брать",
+    "de": "nehmen",
+    "grammatik": "unv., vollendet: взять",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0099",
+   "createdAt": 1767225600098,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "кто",
+    "de": "wer",
+    "grammatik": "",
+    "beispielRu": "Кто э́то?",
+    "beispielDe": "Wer ist das?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0100",
+   "createdAt": 1767225600099,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "что",
+    "de": "was",
+    "grammatik": "",
+    "beispielRu": "Что э́то?",
+    "beispielDe": "Was ist das?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0101",
+   "createdAt": 1767225600100,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "где",
+    "de": "wo",
+    "grammatik": "",
+    "beispielRu": "Где ты?",
+    "beispielDe": "Wo bist du?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0102",
+   "createdAt": 1767225600101,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "когда́",
+    "de": "wann",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0103",
+   "createdAt": 1767225600102,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "почему́",
+    "de": "warum",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0104",
+   "createdAt": 1767225600103,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "как",
+    "de": "wie",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0105",
+   "createdAt": 1767225600104,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "ско́лько",
+    "de": "wie viel|wie viele",
+    "grammatik": "",
+    "beispielRu": "Ско́лько э́то сто́ит?",
+    "beispielDe": "Wie viel kostet das?",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0106",
+   "createdAt": 1767225600105,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "оди́н",
+    "de": "eins",
+    "grammatik": "f. одна́, n. одно́",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0107",
+   "createdAt": 1767225600106,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "два",
+    "de": "zwei",
+    "grammatik": "f. две",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0108",
+   "createdAt": 1767225600107,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "три",
+    "de": "drei",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0109",
+   "createdAt": 1767225600108,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "четы́ре",
+    "de": "vier",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0110",
+   "createdAt": 1767225600109,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "пять",
+    "de": "fünf",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0111",
+   "createdAt": 1767225600110,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "шесть",
+    "de": "sechs",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0112",
+   "createdAt": 1767225600111,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "семь",
+    "de": "sieben",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0113",
+   "createdAt": 1767225600112,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "во́семь",
+    "de": "acht",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0114",
+   "createdAt": 1767225600113,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "де́вять",
+    "de": "neun",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  },
+  {
+   "id": "kartei-starter-ru-0115",
+   "createdAt": 1767225600114,
+   "updatedAt": 1789862400000,
+   "deletedAt": null,
+   "deckId": "kartei-starter-ru",
+   "noteTypeId": "ru-vocab",
+   "fields": {
+    "ru": "де́сять",
+    "de": "zehn",
+    "grammatik": "",
+    "beispielRu": "",
+    "beispielDe": "",
+    "notiz": ""
+   },
+   "tags": [
+    "starter"
+   ]
+  }
+ ]
+}
