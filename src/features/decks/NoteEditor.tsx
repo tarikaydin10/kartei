@@ -6,12 +6,14 @@ import { createNote, deleteNote, updateNote, cardsOfNote } from '@/data/repo'
 import type { AppSettings, Deck, ID, NoteTypeId } from '@/data/types'
 import { emptyFields, missingRequired, noteType } from '@/domain/notetypes'
 import { normalize } from '@/domain/answer'
+import { unstressedWords } from '@/domain/pronounce'
 import { Button } from '@/ui/primitives'
 import { Input, Label, Textarea } from '@/ui/Field'
 import { Sheet } from '@/ui/Sheet'
 import { useToast } from '@/ui/Toast'
 import { cn } from '@/lib/cn'
 import { CyrillicKeyboard } from '@/features/study/CyrillicKeyboard'
+import { Pronunciation } from '@/features/study/Pronunciation'
 
 type El = HTMLInputElement | HTMLTextAreaElement
 
@@ -245,6 +247,9 @@ export function NoteEditor({
               ) : (
                 <Input {...shared} label={`${f.label}${f.required ? ' *' : ''}`} hint={f.hint} />
               )}
+              {f.pronounce && settings.showPronunciation && (
+                <PronunciationPreview value={fields[f.key] ?? ''} />
+              )}
               {f.key === type.identityField && duplicate && (
                 <p className="mt-1.5 flex items-start gap-1.5 text-xs text-warn">
                   <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
@@ -340,4 +345,24 @@ export function NoteEditor({
       </div>
     </Sheet>
   )
+}
+
+/**
+ * Lautschrift live unter dem Feld — und sonst der Hinweis, woran es fehlt.
+ * Nebenbei die beste Kontrolle, ob die Betonung richtig gesetzt ist.
+ */
+function PronunciationPreview({ value }: { value: string }) {
+  const missing = useMemo(() => unstressedWords(value), [value])
+  if (!value.trim()) return null
+  if (missing.length > 0) {
+    return (
+      <p className="mt-1.5 text-[11px] leading-snug text-faint">
+        Aussprache erscheint, sobald die Betonung markiert ist — fehlt bei{' '}
+        <span className="font-ru text-muted">{missing.slice(0, 3).join(', ')}</span>
+        {missing.length > 3 ? ' …' : ''}. Akzent hinter den betonten Vokal setzen (Taste
+        „Betonung“), etwa <span className="font-ru text-muted">молоко́</span>.
+      </p>
+    )
+  }
+  return <Pronunciation text={value} size="sm" className="mt-1.5 justify-start" />
 }

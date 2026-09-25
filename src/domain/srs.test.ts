@@ -82,6 +82,16 @@ describe('replay', () => {
   it('gibt bei leerem Log den Anfangszustand zurück', () => {
     expect(replay(T0, [])).toEqual(initialState(T0))
   })
+
+  it('überspringt Übungsantworten — sie ändern die Planung nicht', () => {
+    const day = 864e5
+    const real = [review(T0, 3), review(T0 + 3 * day, 3)]
+    const practice = [
+      { ...review(T0 + day, 1), id: 'p1', practice: true },
+      { ...review(T0 + day + 60_000, 4), id: 'p2', practice: true },
+    ]
+    expect(replay(T0, [...real, ...practice])).toEqual(replay(T0, real))
+  })
 })
 
 describe('previewDue', () => {

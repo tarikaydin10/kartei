@@ -15,11 +15,13 @@ import { DeckDetail } from './DeckDetail'
 export function DecksScreen({
   settings,
   onStudy,
+  onMore,
   openDeckId,
   setOpenDeckId,
 }: {
   settings: AppSettings
   onStudy: (deckId: ID) => void
+  onMore: (deckId: ID) => void
   openDeckId: ID | null
   setOpenDeckId: (id: ID | null) => void
 }) {
@@ -36,6 +38,7 @@ export function DecksScreen({
         settings={settings}
         onBack={() => setOpenDeckId(null)}
         onStudy={onStudy}
+        onMore={onMore}
       />
     )
   }

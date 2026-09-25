@@ -11,7 +11,7 @@ import { newId } from '@/lib/id'
 import { dayKey, startOfDay } from '@/lib/date'
 import { defaultTemplateIds, noteType } from '@/domain/notetypes'
 import { applyRating, initialState, replay, type SrsState } from '@/domain/srs'
-import { buildQueue } from '@/domain/session'
+import { pickCards, poolCounts, type PoolCounts, type StudyMode } from '@/domain/session'
 import {
   DEFAULT_SETTINGS,
   type AppSettings,
@@ -389,23 +389,75 @@ export async function newIntroducedToday(now = Date.now()): Promise<number> {
   return ids.size
 }
 
+/** Was gelernt werden soll. Ohne `mode` der Tagesplan. */
+export interface StudyRequest {
+  deckId: ID | null
+  mode: StudyMode
+  size?: number
+  /** Für `repeat`: genau diese Karten. */
+  cardIds?: ID[]
+}
+
+/** Zeitraum, in dem falsche Antworten eine Karte als „schwierig“ markieren. */
+const MISS_WINDOW = 30 * 86_400_000
+
+/** Restkontingent neuer Karten heute — je Deck oder global. */
+async function newLimitFor(deckId: ID | null, settings: AppSettings, now: number): Promise<number> {
+  const deck = deckId ? await getDeck(deckId) : undefined
+  const perDay = deck?.newPerDay && deck.newPerDay > 0 ? deck.newPerDay : settings.newPerDay
+  return Math.max(0, perDay - (await newIntroducedToday(now)))
+}
+
+/** Heute beantwortete Karten und falsche Antworten der letzten Wochen. */
+async function recentActivity(now: number): Promise<{ todayIds: Set<ID>; misses: Map<ID, number> }> {
+  const from = Math.min(startOfDay(now), now - MISS_WINDOW)
+  const rows = await db.reviews.where('ts').aboveOrEqual(from).toArray()
+  const today = startOfDay(now)
+  const todayIds = new Set<ID>()
+  const misses = new Map<ID, number>()
+  for (const r of rows) {
+    if (r.ts >= today) todayIds.add(r.cardId)
+    if (r.rating === 1 && r.ts >= now - MISS_WINDOW) misses.set(r.cardId, (misses.get(r.cardId) ?? 0) + 1)
+  }
+  return { todayIds, misses }
+}
+
+export interface StudyPools extends PoolCounts {
+  /** Karten im Tagesplan (fällig + neue im Limit), vor der Sessiongröße. */
+  planned: number
+}
+
+/** Wie viel jeder Lernmodus gerade hergibt. */
+export async function studyPools(deckId: ID | null, settings: AppSettings, now = Date.now()): Promise<StudyPools> {
+  const cards = await liveCards(deckId)
+  const { todayIds, misses } = await recentActivity(now)
+  const newLimit = await newLimitFor(deckId, settings, now)
+  const counts = poolCounts(cards, { now, todayIds, misses })
+  const due = cards.filter((c) => c.state !== 0 && c.due <= now).length
+  return { ...counts, planned: due + Math.min(counts.fresh, newLimit) }
+}
+
 export async function buildSession(
   deckId: ID | null,
   settings: AppSettings,
-  overrides: { size?: number } = {},
+  overrides: { size?: number; mode?: StudyMode; cardIds?: ID[] } = {},
 ): Promise<StudyCard[]> {
   const now = Date.now()
+  const mode = overrides.mode ?? 'due'
   const size = overrides.size ?? settings.sessionSize
   const cards = await liveCards(deckId)
+  const newLimit = mode === 'due' ? await newLimitFor(deckId, settings, now) : 0
+  const activity =
+    mode === 'today' || mode === 'hard'
+      ? await recentActivity(now)
+      : { todayIds: new Set<ID>(), misses: new Map<ID, number>() }
 
-  const deck = deckId ? await getDeck(deckId) : undefined
-  const perDay = deck?.newPerDay && deck.newPerDay > 0 ? deck.newPerDay : settings.newPerDay
-  const introduced = await newIntroducedToday(now)
-  const newLimit = Math.max(0, perDay - introduced)
-
-  const due = cards.filter((c) => c.state !== 0 && c.due <= now)
-  const fresh = cards.filter((c) => c.state === 0)
-  const queue = buildQueue(due, fresh, { size, newLimit, now })
+  const queue = pickCards(mode, cards, size, {
+    now,
+    newLimit,
+    ...activity,
+    cardIds: overrides.cardIds,
+  })
 
   const notes = await db.notes.bulkGet([...new Set(queue.map((c) => c.noteId))])
   const noteById = new Map<ID, Note>()
@@ -426,11 +478,33 @@ export interface ReviewInput {
   typed: string
   durationMs: number
   deviceId: string
+  /** Übung: ins Log, aber ohne Einfluss auf die Planung. */
+  practice?: boolean
 }
 
 /** Review anfügen und den abgeleiteten Kartenzustand fortschreiben — atomar. */
 export async function recordReview(input: ReviewInput, now = Date.now()): Promise<Card> {
   const { card, rating } = input
+
+  if (input.practice) {
+    // Die Karte bleibt unberührt — genau das, was `replay` später auch ergibt.
+    // `wasNew` bleibt falsch: eine Übung führt keine Karte ein.
+    await db.reviews.add({
+      id: newId(),
+      cardId: card.id,
+      noteId: card.noteId,
+      deckId: card.deckId,
+      ts: now,
+      rating,
+      durationMs: Math.max(0, Math.round(input.durationMs)),
+      typed: input.typed,
+      verdict: input.verdict,
+      wasNew: false,
+      deviceId: input.deviceId,
+      practice: true,
+    })
+    return card
+  }
   const next = applyRating(cardState(card), rating, now)
   const updated: Card = { ...card, ...next, updatedAt: now }
 

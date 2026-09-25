@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BarChart3, House, Layers, SlidersHorizontal } from 'lucide-react'
-import { ensureDeviceId, ensureSeed, listDecks } from '@/data/repo'
+import { ensureDeviceId, ensureSeed, listDecks, type StudyRequest } from '@/data/repo'
 import { useSettings } from '@/data/useSettings'
 import type { ID } from '@/data/types'
 import { cn } from '@/lib/cn'
@@ -14,6 +14,7 @@ import { NoteEditor } from '@/features/decks/NoteEditor'
 import { StatsScreen } from '@/features/stats/StatsScreen'
 import { DataScreen } from '@/features/data/DataScreen'
 import { StudyScreen } from '@/features/study/StudyScreen'
+import { StudyOptionsSheet } from '@/features/study/StudyOptions'
 
 type Tab = 'today' | 'decks' | 'stats' | 'data'
 
@@ -38,8 +39,21 @@ function Shell() {
   const [ready, setReady] = useState(false)
   const [tab, setTab] = useState<Tab>('today')
   const [openDeckId, setOpenDeckId] = useState<ID | null>(null)
-  const [study, setStudy] = useState<{ deckId: ID | null } | null>(null)
+  const [study, setStudy] = useState<{ request: StudyRequest; run: number } | null>(null)
+  /** Offene Auswahl „Mehr lernen“ für ein Deck (`null` = alle). */
+  const [more, setMore] = useState<{ deckId: ID | null } | null>(null)
   const [quickAdd, setQuickAdd] = useState(false)
+  const runs = useRef(0)
+
+  /* Jede Session bekommt einen eigenen Schlüssel — „Nochmal üben“ baut eine
+     frische Session, statt die laufende umzubauen. */
+  const startStudy = useCallback((request: StudyRequest) => {
+    runs.current += 1
+    setMore(null)
+    setStudy({ request, run: runs.current })
+  }, [])
+  const studyPlan = useCallback((deckId: ID | null) => startStudy({ deckId, mode: 'due' }), [startStudy])
+  const openMore = useCallback((deckId: ID | null) => setMore({ deckId }), [])
 
   useEffect(() => {
     void (async () => {
@@ -60,17 +74,35 @@ function Shell() {
     )
   }
 
+  const deckName = (id: ID | null) => (id ? decks.find((d) => d.id === id)?.name : null) ?? 'Alle Decks'
+
+  const moreSheet = (
+    <StudyOptionsSheet
+      open={more !== null}
+      onClose={() => setMore(null)}
+      deckId={more?.deckId ?? null}
+      deckName={deckName(more?.deckId ?? null)}
+      settings={settings}
+      onStart={startStudy}
+    />
+  )
+
   /* Die Lernsession übernimmt den ganzen Bildschirm — keine Navigation,
      keine Zahlen, keine Ablenkung. */
   if (study) {
-    const deck = study.deckId ? decks.find((d) => d.id === study.deckId) : null
     return (
-      <StudyScreen
-        deckId={study.deckId}
-        deckName={deck?.name ?? 'Alle Decks'}
-        settings={settings}
-        onExit={() => setStudy(null)}
-      />
+      <>
+        <StudyScreen
+          key={study.run}
+          request={study.request}
+          deckName={deckName(study.request.deckId)}
+          settings={settings}
+          onExit={() => setStudy(null)}
+          onRestart={startStudy}
+          onMore={() => openMore(study.request.deckId)}
+        />
+        {moreSheet}
+      </>
     )
   }
 
@@ -80,7 +112,8 @@ function Shell() {
         {tab === 'today' && (
           <TodayScreen
             settings={settings}
-            onStudy={(deckId) => setStudy({ deckId })}
+            onStudy={studyPlan}
+            onMore={openMore}
             onAddCard={() => setQuickAdd(true)}
             onOpenDeck={(id) => {
               setOpenDeckId(id)
@@ -93,7 +126,8 @@ function Shell() {
         {tab === 'decks' && (
           <DecksScreen
             settings={settings}
-            onStudy={(deckId) => setStudy({ deckId })}
+            onStudy={studyPlan}
+            onMore={openMore}
             openDeckId={openDeckId}
             setOpenDeckId={setOpenDeckId}
           />
@@ -130,6 +164,8 @@ function Shell() {
           })}
         </div>
       </nav>
+
+      {moreSheet}
 
       {decks[0] && (
         <NoteEditor

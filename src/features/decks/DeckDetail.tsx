@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import {
   ChevronLeft,
   CheckSquare,
+  Dumbbell,
   FolderInput,
   MoreVertical,
   Pause,
@@ -40,12 +41,14 @@ export function DeckDetail({
   settings,
   onBack,
   onStudy,
+  onMore,
 }: {
   deck: Deck
   decks: Deck[]
   settings: AppSettings
   onBack: () => void
   onStudy: (deckId: ID) => void
+  onMore: (deckId: ID) => void
 }) {
   const toast = useToast()
   const notes = useLiveQuery(() => listNotes(deck.id), [deck.id], [])
@@ -125,15 +128,22 @@ export function DeckDetail({
           <Stat label="im Lernen" value={counts.learning} />
           <Stat label="Karten" value={counts.total} />
         </div>
-        <Button
-          variant="accent"
-          block
-          className="mt-4"
-          disabled={counts.due + counts.fresh === 0}
-          onClick={() => onStudy(deck.id)}
-        >
-          <Play className="size-4" /> Lernen
-        </Button>
+        <div className="mt-4 flex gap-2">
+          {counts.due + counts.fresh > 0 && (
+            <Button variant="accent" block onClick={() => onStudy(deck.id)}>
+              <Play className="size-4" /> Lernen
+            </Button>
+          )}
+          <Button
+            variant={counts.due + counts.fresh > 0 ? 'surface' : 'accent'}
+            block={counts.due + counts.fresh === 0}
+            disabled={counts.total === 0}
+            onClick={() => onMore(deck.id)}
+            className="shrink-0"
+          >
+            <Dumbbell className="size-4" /> Mehr lernen
+          </Button>
+        </div>
       </Panel>
 
       {/* Suche und Aktionen */}

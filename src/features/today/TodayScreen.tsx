@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Flame, Plus, Play, ShieldCheck, Sparkles } from 'lucide-react'
+import { Dumbbell, Flame, Plus, Play, ShieldCheck, Sparkles } from 'lucide-react'
 import { countsByDeck, countsFor, listDecks, reviewsSince, reviewsToday } from '@/data/repo'
 import type { AppSettings, ID } from '@/data/types'
 import { computeStreak, dayStats, goalDays } from '@/domain/streak'
@@ -11,12 +11,15 @@ const YEAR = 400 * 86_400_000
 export function TodayScreen({
   settings,
   onStudy,
+  onMore,
   onAddCard,
   onOpenDeck,
   onOpenData,
 }: {
   settings: AppSettings
   onStudy: (deckId: ID | null) => void
+  /** Auswahl jenseits des Tagesplans: vorarbeiten, üben, neue Karten. */
+  onMore: (deckId: ID | null) => void
   onAddCard: () => void
   onOpenDeck: (deckId: ID) => void
   onOpenData: () => void
@@ -74,10 +77,23 @@ export function TodayScreen({
 
         <div className="border-t border-line-soft p-4">
           {hasCards ? (
-            <Button variant="accent" size="lg" block onClick={() => onStudy(null)}>
-              <Play className="size-4" />
-              {workload > 0 ? `Lernen · ${Math.min(workload, settings.sessionSize)} Karten` : 'Vorarbeiten'}
-            </Button>
+            workload > 0 ? (
+              <>
+                <Button variant="accent" size="lg" block onClick={() => onStudy(null)}>
+                  <Play className="size-4" />
+                  Lernen · {Math.min(workload, settings.sessionSize)} Karten
+                </Button>
+                <Button variant="ghost" size="sm" block className="mt-2" onClick={() => onMore(null)}>
+                  <Dumbbell className="size-3.5" />
+                  Mehr lernen
+                </Button>
+              </>
+            ) : (
+              <Button variant="accent" size="lg" block onClick={() => onMore(null)}>
+                <Dumbbell className="size-4" />
+                Mehr lernen
+              </Button>
+            )
           ) : (
             <Button variant="accent" size="lg" block onClick={onAddCard}>
               <Plus className="size-4" />
@@ -137,9 +153,9 @@ export function TodayScreen({
                     {c.due === 0 && c.fresh > 0 && <Badge tone="muted">{fmt(c.fresh)} neu</Badge>}
                   </button>
                   <button
-                    onClick={() => onStudy(deck.id)}
-                    disabled={ready === 0}
-                    aria-label={`${deck.name} lernen`}
+                    onClick={() => (ready > 0 ? onStudy(deck.id) : onMore(deck.id))}
+                    disabled={c.total === 0}
+                    aria-label={ready > 0 ? `${deck.name} lernen` : `${deck.name}: mehr lernen`}
                     className="mr-2 grid size-10 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface-2 hover:text-accent-2 disabled:opacity-25"
                   >
                     <Play className="size-4" />
@@ -174,7 +190,7 @@ export function TodayScreen({
 
 function headline(progress: number, workload: number, streak: number): string {
   if (progress >= 1) return 'Tagesziel erreicht. Alles weitere ist Bonus.'
-  if (workload === 0) return 'Nichts fällig. Du kannst vorarbeiten oder es dabei lassen.'
+  if (workload === 0) return 'Nichts fällig. Du kannst vorarbeiten, üben oder es dabei lassen.'
   if (streak === 0) return 'Eine Runde jetzt, und der Streak beginnt.'
   if (progress > 0) return 'Angefangen. Der Rest ist kurz.'
   return 'Kurz dranbleiben hält den Streak.'

@@ -37,6 +37,8 @@ Der Build ist ein statisches Bundle — host-agnostisch, per FTPS deploybar
 3. **Der FSRS-Zustand auf der Karte ist Cache, nicht Wahrheit.** Er muss
    jederzeit über `replay(createdAt, reviews)` reproduzierbar bleiben. Wer den
    Zustand anfasst, ohne ein Review zu schreiben, bricht den späteren Sync.
+   Übungsantworten (`practice: true`) stehen im Log, ändern die Karte nicht und
+   werden von `replay` übersprungen — beides muss zusammenpassen.
 4. **Sync-ready Records.** Jeder Datensatz trägt `id` (UUID), `createdAt`,
    `updatedAt`, `deletedAt`. **Nie hart löschen.**
 5. **Ein Importpfad.** JSON und CSV laufen beide durch `importExportFile`. Der
@@ -45,23 +47,24 @@ Der Build ist ein statisches Bundle — host-agnostisch, per FTPS deploybar
    Warteschlange und Streak liegen in `src/domain/` ohne DB- oder React-Bezug
    und sind unit-getestet. Dort zuerst testen, dann die UI anfassen.
 7. **Offline ohne Ausnahme.** Keine Runtime-Abhängigkeit vom Netz. Nichts
-   verlässt das Gerät außer durch einen bewussten Export.
+   verlässt das Gerät außer durch einen bewussten Export. Das gilt auch fürs
+   Vorlesen: nur Stimmen mit `localService` (`lib/speech.ts`).
 
 ## Verzeichnisse
 
 ```
 src/
 ├─ data/        Dexie-Schema, Repository, Typen, Settings-Hook
-├─ domain/      reine Logik: answer, srs, session, streak, notetypes
+├─ domain/      reine Logik: answer, srs, session, streak, notetypes, pronounce
 ├─ io/          Import/Export: schema, importer, exporter, csv
 ├─ ui/          Primitives, Sheet, Field, Toast
 ├─ features/
 │  ├─ today/    Dashboard mit Tagesziel und Streak
-│  ├─ study/    Lernsession + ЙЦУКЕН-Tastatur
+│  ├─ study/    Lernsession, „Mehr lernen“, Aussprache, ЙЦУКЕН-Tastatur
 │  ├─ decks/    Deckliste, Deckdetail, Notiz-Editor
 │  ├─ stats/    Heatmap, Fälligkeitsvorschau, Bestand
 │  └─ data/     Backup, Import, Einstellungen
-└─ lib/         id, date, haptics, sound, cn
+└─ lib/         id, date, haptics, sound, speech, cn
 scripts/        make-starter.mjs, make-icons.mjs, deploy.mjs
 ```
 
@@ -81,11 +84,18 @@ scripts/        make-starter.mjs, make-icons.mjs, deploy.mjs
   hochsetzen, sonst erreicht die Korrektur niemanden, der das Deck schon hat.
 - **Neuer Kartentyp** = ein Eintrag in `domain/notetypes.ts` (Felder +
   Vorlagen). Kein neuer Code-Pfad nötig; genau dafür ist die Struktur da.
+  `pronounce: true` an einem Feld schaltet die Lautschrift dafür ein.
+- **Neuer Lernmodus** = ein Eintrag in `STUDY_MODES` und ein Fall in
+  `pickCards` (`domain/session.ts`). `practice: true` heißt: ins Log, nicht
+  in die Planung.
+- **Aussprache** (`domain/pronounce.ts`) liefert `null`, wenn bei einem
+  mehrsilbigen Wort die Betonung fehlt. Nicht raten — lieber keine Lautschrift.
 
 ## Nächster Schritt
 
 **Sync.** Eigener Endpunkt, Push/Pull über `updatedAt`:
 
 - Inhalte (Decks, Notizen): Last-Write-Wins pro Datensatz.
-- Fortschritt: Reviews per ID vereinigen, danach `replay` — nie mergen.
+- Fortschritt: Reviews per ID vereinigen (Übungsreviews inklusive), danach
+  `replay` — nie mergen.
 - Tombstones respektieren, `deviceId` steckt bereits in jedem Review.

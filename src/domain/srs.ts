@@ -93,10 +93,13 @@ export function previewDue(state: SrsState, now = Date.now()): Record<Rating, nu
  * Zustand aus dem unveränderlichen Review-Log neu berechnen.
  * Wird nach einem Sync-Merge gebraucht und ist die Absicherung dagegen, dass
  * der denormalisierte Zustand auf der Karte je „die Wahrheit“ wird.
+ *
+ * Übungsantworten (`practice`) stehen im Log, zählen hier aber nicht — sie
+ * haben die Karte nie verändert, also darf der Replay es auch nicht.
  */
 export function replay(createdAt: number, reviews: Review[]): SrsState {
   let state = initialState(createdAt)
-  for (const r of [...reviews].sort((a, b) => a.ts - b.ts)) {
+  for (const r of reviews.filter((x) => !x.practice).sort((a, b) => a.ts - b.ts)) {
     state = applyRating(state, r.rating, r.ts)
   }
   return state

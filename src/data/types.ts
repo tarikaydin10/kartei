@@ -77,6 +77,12 @@ export interface Review {
   /** War die Karte vor dieser Antwort neu? Macht „heute neu gelernt“ trivial. */
   wasNew: boolean
   deviceId: string
+  /**
+   * Übungsantwort (Session wiederholen, schwierige Karten …): zählt als
+   * Aktivität, ändert aber die Planung nicht — `replay` überspringt sie.
+   * Fehlt bei allen älteren Reviews, dort also immer planungswirksam.
+   */
+  practice?: boolean
 }
 
 export interface StoredSetting {
@@ -99,6 +105,8 @@ export interface AppSettings {
   sound: boolean
   /** Bildschirmtastatur ЙЦУКЕН statt Systemtastatur für kyrillische Eingabe. */
   cyrillicKeyboard: boolean
+  /** Lautschrift zu russischen Wörtern, wo die Betonung feststeht. */
+  showPronunciation: boolean
   lastBackupAt: number | null
   deviceId: string
 }
@@ -113,6 +121,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   haptics: true,
   sound: false,
   cyrillicKeyboard: true,
+  showPronunciation: true,
   lastBackupAt: null,
   deviceId: '',
 }

@@ -14,6 +14,8 @@ import { formatBytes, requestPersistence, storageState, type StorageState } from
 import { listDecks, saveSetting, totals } from '@/data/repo'
 import type { AppSettings, ID } from '@/data/types'
 import { buildCsv, buildExport, exportFilename, saveTextFile } from '@/io/exporter'
+import { PRONUNCIATION_LEGEND } from '@/domain/pronounce'
+import { useLocalVoice } from '@/lib/speech'
 import { parseExportFile } from '@/io/schema'
 import { importExportFile, type ImportReport } from '@/io/importer'
 import { Button, Panel, SectionTitle } from '@/ui/primitives'
@@ -40,6 +42,7 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
   const [report, setReport] = useState<ImportReport | null>(null)
   const [shareDeck, setShareDeck] = useState(false)
   const [confirmWipe, setConfirmWipe] = useState(false)
+  const ruVoice = useLocalVoice('ru')
 
   /* --- Export ------------------------------------------------------ */
 
@@ -262,6 +265,25 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
             onChange={(v) => void saveSetting('cyrillicKeyboard', v)}
           />
         </Panel>
+      </div>
+
+      {/* Aussprache */}
+      <div className="mt-6">
+        <SectionTitle>Aussprache</SectionTitle>
+        <Panel className="px-4">
+          <Switch
+            label="Aussprache anzeigen"
+            hint="Lautschrift zu russischen Wörtern und Beispielsätzen — überall dort, wo die Betonung markiert ist oder feststeht."
+            checked={settings.showPronunciation}
+            onChange={(v) => void saveSetting('showPronunciation', v)}
+          />
+        </Panel>
+        <p className="mt-2 px-1 text-[11px] leading-relaxed text-faint">
+          {PRONUNCIATION_LEGEND}.{' '}
+          {ruVoice
+            ? `Vorlesen mit der Gerätestimme „${ruVoice.name}“.`
+            : 'Vorlesen gibt es, sobald das Gerät eine lokale russische Stimme hat — Online-Stimmen nutzt Kartei bewusst nicht.'}
+        </p>
       </div>
 
       {/* Rückmeldung */}

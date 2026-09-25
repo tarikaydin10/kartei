@@ -9,6 +9,12 @@ her aber für jedes Thema gebaut.
   geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch.
 - **FSRS.** Wiederholungsplanung über [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs),
   denselben Algorithmus, den auch Anki verwendet.
+- **Mehr als der Tagesplan.** Vorarbeiten, zusätzliche neue Karten, heute
+  Gelerntes, schwierige Karten, zufällig gemischt — und am Ende jeder Session
+  „Fehler üben“ oder „Nochmal üben“.
+- **Aussprache.** Lautschrift in deutscher Lesart (молоко́ → [malakó]) überall,
+  wo die Betonung feststeht; Vorlesen, wenn das Gerät eine lokale russische
+  Stimme hat.
 - **Import/Export ohne Dubletten.** Ein versioniertes JSON und CSV/TSV mit
   Spaltenzuordnung. Derselbe Import zweimal ausgeführt ändert nichts.
 - **Sync-vorbereitet.** UUIDs, `updatedAt` und Tombstones sind von Anfang an da;
@@ -65,7 +71,7 @@ einmal richtig wählen.
 | ---------- | ------------------------------------------------------------ |
 | **Note**   | der Inhalt (`ru`, `de`, Grammatik, Beispiel) — teilbar        |
 | **Card**   | eine Lernrichtung der Note (RU→DE, DE→RU) mit eigenem Verlauf |
-| **Review** | ein Lernereignis, unveränderlich, append-only                 |
+| **Review** | ein Lernereignis, unveränderlich, append-only (`practice` = Übung) |
 
 Der FSRS-Zustand auf der Karte ist ein abgeleiteter Cache und jederzeit aus dem
 Review-Log rekonstruierbar (`domain/srs.ts → replay`). Daraus folgen drei
@@ -76,6 +82,42 @@ Eigenschaften:
 2. Ein Deck lässt sich ohne den eigenen Fortschritt weitergeben.
 3. Synchronisierung wird konfliktfrei: Reviews werden nur vereinigt, der
    Zustand danach neu berechnet.
+
+## Lernen jenseits des Tagesplans
+
+„Mehr lernen“ (auf „Heute“, im Deck und am Ende jeder Session) bietet zwei
+Arten zusätzlicher Runden, Logik in `domain/session.ts → pickCards`:
+
+| Modus                      | Zählt für FSRS | Auswahl                                          |
+| -------------------------- | -------------- | ------------------------------------------------ |
+| Vorarbeiten                | ja             | die nächsten noch nicht fälligen Karten           |
+| Zusätzliche neue Karten    | ja             | neue Karten über das Tageslimit hinaus            |
+| Heute gelernte             | nein (Übung)   | alles, was heute schon eine Antwort bekam         |
+| Schwierige Karten          | nein (Übung)   | Rückfälle, hohe FSRS-Schwierigkeit, Fehler der letzten 30 Tage |
+| Zufällig gemischt          | nein (Übung)   | querbeet aus allen bekannten Karten               |
+| Fehler üben / Nochmal üben | nein (Übung)   | Karten der gerade beendeten Session               |
+
+Übungsantworten landen mit `practice: true` im Review-Log: Sie zählen für
+Tagesziel, Streak und Heatmap, aber `replay` überspringt sie und die Karte
+bleibt unverändert. Sonst würde Pauken am selben Tag die Intervalle aufblähen.
+
+## Aussprache (Russisch)
+
+`domain/pronounce.ts`, rein und unit-getestet. Lautschrift gibt es nur, wo die
+Betonung feststeht — Betonungszeichen, `ё` oder ein einziger Vokal. Eine
+geratene Aussprache wäre schlimmer als keine; der Editor sagt, wo das Zeichen
+fehlt.
+
+- Betonung als Akzent, Vokalreduktion (unbetontes о → a, е/я → i).
+- Weiche Konsonanten (`njet`, `djen'`), Auslautverhärtung (`chljep`),
+  Stimmangleichung (`ftschirá`), Präpositionen verschmelzen mit dem Folgewort.
+- Stumme Buchstaben (здра́вствуйте → sdrástwujtje), `г` als w in -ого/-его,
+  `-ться` → za, echte Ausnahmen wie что → schto, сего́дня → siwódnja.
+- Schreibweise nach deutschen Lesegewohnheiten: `sch` = ш, `sh` = ж,
+  `schsch` = щ, `tsch` = ч, `z` = ц, `w` = в, `y` = ы, `ch` wie in „Bach“.
+
+Vorlesen läuft über die Web Speech API und **nur mit lokalen Stimmen** —
+Online-Stimmen würden den Text an einen Server schicken.
 
 ## Antwortprüfung (Russisch)
 
@@ -93,7 +135,8 @@ Eigenschaften:
 
 ## Stand
 
-Offline-first komplett: Lernen, Decks, Editor, Statistik, Import/Export, PWA.
+Offline-first komplett: Lernen (Tagesplan, Vorarbeiten, Übungsrunden),
+Aussprache, Decks, Editor, Statistik, Import/Export, PWA.
 
 Offen: **Synchronisierung** zwischen Geräten. Vorgesehen ist ein schlanker
 eigener Endpunkt mit Push/Pull über `updatedAt`. Die Datenschicht ist darauf

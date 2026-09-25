@@ -10,6 +10,8 @@ export interface FieldDef {
   alternatives?: boolean
   multiline?: boolean
   required?: boolean
+  /** Russischer Text, zu dem eine Lautschrift angezeigt wird (domain/pronounce.ts). */
+  pronounce?: boolean
   placeholder?: string
   hint?: string
 }
@@ -52,6 +54,7 @@ const RU_VOCAB: NoteTypeDef = {
       label: 'Russisch',
       lang: 'ru',
       required: true,
+      pronounce: true,
       placeholder: 'сто́л',
       hint: 'Betonungszeichen dürfen drin stehen — beim Abfragen sind sie egal.',
     },
@@ -76,6 +79,7 @@ const RU_VOCAB: NoteTypeDef = {
       label: 'Beispiel (RU)',
       lang: 'ru',
       multiline: true,
+      pronounce: true,
       placeholder: 'Кни́га на столе́.',
     },
     {

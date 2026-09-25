@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { buildQueue, interleave, requeue } from './session'
+import {
+  buildQueue,
+  hardness,
+  interleave,
+  pickCards,
+  poolCounts,
+  requeue,
+  shuffle,
+  type PickContext,
+} from './session'
 import type { Card } from '@/data/types'
 
 function card(id: string, over: Partial<Card> = {}): Card {
@@ -106,5 +115,125 @@ describe('requeue', () => {
   it('lässt die Schlange bei ungültiger Position unverändert', () => {
     const q = ['a']
     expect(requeue(q, 5)).toBe(q)
+  })
+})
+
+/** Deterministischer Zufall für reproduzierbare Tests. */
+function seeded(seed = 42): () => number {
+  let s = seed
+  return () => {
+    s = (s * 1103515245 + 12345) % 2147483648
+    return s / 2147483648
+  }
+}
+
+const NOW = 1_000_000
+
+function ctx(over: Partial<PickContext> = {}): PickContext {
+  return { now: NOW, newLimit: 10, todayIds: new Set(), misses: new Map(), rng: seeded(), ...over }
+}
+
+describe('pickCards', () => {
+  const pool = [
+    card('a1', { due: NOW + 3000 }),
+    card('a2', { due: NOW + 1000 }),
+    card('a3', { due: NOW + 2000 }),
+    card('d1', { due: NOW - 10 }),
+    card('n1', { state: 0, reps: 0, createdAt: 2 }),
+    card('n2', { state: 0, reps: 0, createdAt: 1 }),
+    card('s1', { due: NOW + 500, suspended: true }),
+  ]
+
+  it('due entspricht dem Tagesplan', () => {
+    const q = pickCards('due', pool, 20, ctx({ newLimit: 1 }))
+    expect(q.map((c) => c.id)).toEqual(['d1', 'n2'])
+  })
+
+  it('ahead nimmt die nächsten noch nicht fälligen Karten', () => {
+    const q = pickCards('ahead', pool, 2, ctx())
+    expect(q.map((c) => c.id)).toEqual(['a2', 'a3'])
+  })
+
+  it('ahead lässt neue, fällige und gesperrte Karten weg', () => {
+    const ids = pickCards('ahead', pool, 20, ctx()).map((c) => c.id)
+    expect(ids).not.toContain('d1')
+    expect(ids).not.toContain('n1')
+    expect(ids).not.toContain('s1')
+  })
+
+  it('new ignoriert das Tageslimit und nimmt die ältesten zuerst', () => {
+    const q = pickCards('new', pool, 20, ctx({ newLimit: 0 }))
+    expect(q.map((c) => c.id)).toEqual(['n2', 'n1'])
+  })
+
+  it('today nimmt nur heute beantwortete, bekannte Karten', () => {
+    const q = pickCards('today', pool, 20, ctx({ todayIds: new Set(['a1', 'd1', 'n1', 's1']) }))
+    expect(q.map((c) => c.id).sort()).toEqual(['a1', 'd1'])
+  })
+
+  it('hard wählt nach Schwierigkeit und lässt leichte weg', () => {
+    const cards = [
+      card('e1', { difficulty: 2 }),
+      card('h1', { lapses: 3 }),
+      card('h2', { difficulty: 6 }),
+      card('h3', { difficulty: 3 }),
+    ]
+    const q = pickCards('hard', cards, 2, ctx({ misses: new Map([['h3', 1]]) }))
+    expect(q.map((c) => c.id).sort()).toEqual(['h1', 'h3'])
+  })
+
+  it('random nimmt nur bekannte Karten und hält die Größe ein', () => {
+    const q = pickCards('random', pool, 3, ctx())
+    expect(q).toHaveLength(3)
+    expect(q.every((c) => c.state !== 0 && !c.suspended)).toBe(true)
+  })
+
+  it('repeat nimmt genau die gewünschten Karten, auch neue', () => {
+    const q = pickCards('repeat', pool, 1, ctx({ cardIds: ['a1', 'n1', 'fehlt'] }))
+    expect(q.map((c) => c.id).sort()).toEqual(['a1', 'n1'])
+  })
+})
+
+describe('poolCounts', () => {
+  it('zählt je Modus, ohne gesperrte Karten', () => {
+    const cards = [
+      card('a', { due: NOW + 1 }),
+      card('b', { due: NOW - 1, lapses: 1 }),
+      card('c', { state: 0, reps: 0 }),
+      card('d', { due: NOW + 1, suspended: true }),
+    ]
+    expect(poolCounts(cards, { now: NOW, todayIds: new Set(['a']), misses: new Map() })).toEqual({
+      ahead: 1,
+      fresh: 1,
+      today: 1,
+      hard: 1,
+      known: 2,
+    })
+  })
+})
+
+describe('hardness', () => {
+  it('ist 0 für neue und unauffällige Karten', () => {
+    expect(hardness(card('x', { state: 0, lapses: 5 }))).toBe(0)
+    expect(hardness(card('x', { difficulty: 3 }))).toBe(0)
+  })
+
+  it('steigt mit Rückfällen und frischen Fehlern', () => {
+    const base = card('x', { difficulty: 3 })
+    expect(hardness(base, 1)).toBeGreaterThan(0)
+    expect(hardness({ ...base, lapses: 2 }, 1)).toBeGreaterThan(hardness(base, 1))
+  })
+})
+
+describe('shuffle', () => {
+  it('behält alle Elemente und lässt die Eingabe unverändert', () => {
+    const input = [1, 2, 3, 4, 5, 6]
+    const out = shuffle(input, seeded(7))
+    expect([...out].sort()).toEqual(input)
+    expect(input).toEqual([1, 2, 3, 4, 5, 6])
+  })
+
+  it('ist mit gleichem Zufall reproduzierbar', () => {
+    expect(shuffle([1, 2, 3, 4, 5], seeded(1))).toEqual(shuffle([1, 2, 3, 4, 5], seeded(1)))
   })
 })
