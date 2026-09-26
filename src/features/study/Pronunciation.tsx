@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Volume2 } from 'lucide-react'
-import { PRONUNCIATION_LEGEND, pronounce } from '@/domain/pronounce'
+import { PRONUNCIATION_LEGEND, annotate, pronounce } from '@/domain/pronounce'
 import { withoutStress } from '@/domain/answer'
 import { speak, useLocalVoice } from '@/lib/speech'
 import { cn } from '@/lib/cn'
@@ -51,5 +51,29 @@ export function Pronunciation({
         </button>
       )}
     </p>
+  )
+}
+
+/**
+ * Mischtext wie „m., Pl. лю́ди“ mit der Lautschrift direkt hinter jeder
+ * russischen Stelle: „m., Pl. лю́ди [ljúdi]“. Ohne Aussprache einfach der Text.
+ */
+export function InlinePronunciation({ text, enabled = true }: { text: string; enabled?: boolean }) {
+  const parts = useMemo(() => (enabled ? annotate(text) : []), [text, enabled])
+  if (!enabled) return <>{text}</>
+  return (
+    <>
+      {parts.map((p, i) => (
+        <span key={i}>
+          {p.text}
+          {p.pron && (
+            <span title={PRONUNCIATION_LEGEND} className="font-sans text-faint">
+              {' '}
+              [{p.pron}]
+            </span>
+          )}
+        </span>
+      ))}
+    </>
   )
 }

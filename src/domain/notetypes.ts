@@ -10,8 +10,12 @@ export interface FieldDef {
   alternatives?: boolean
   multiline?: boolean
   required?: boolean
-  /** Russischer Text, zu dem eine Lautschrift angezeigt wird (domain/pronounce.ts). */
-  pronounce?: boolean
+  /**
+   * Lautschrift anzeigen (domain/pronounce.ts). `true`: das Feld ist russischer
+   * Text, die Lautschrift steht darunter. `'inline'`: Mischtext wie
+   * „m., Pl. лю́ди“ — nur die russischen Stellen, jeweils direkt dahinter.
+   */
+  pronounce?: true | 'inline'
   placeholder?: string
   hint?: string
 }
@@ -71,6 +75,7 @@ const RU_VOCAB: NoteTypeDef = {
       key: 'grammatik',
       label: 'Grammatik',
       lang: 'ru',
+      pronounce: 'inline',
       placeholder: 'm., Pl. столы́',
       hint: 'Genus, Plural, Aspektpartner — frei formuliert.',
     },

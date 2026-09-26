@@ -18,7 +18,7 @@ import {
 import type { AppSettings, Card, ID } from '@/data/types'
 import { Button, ProgressBar, Spinner } from '@/ui/primitives'
 import { CyrillicKeyboard } from './CyrillicKeyboard'
-import { Pronunciation } from './Pronunciation'
+import { InlinePronunciation, Pronunciation } from './Pronunciation'
 
 type Phase = 'loading' | 'prompt' | 'result' | 'retype' | 'done'
 
@@ -87,8 +87,10 @@ export function StudyScreen({
   const answerRaw = current && template ? (current.note.fields[template.answerField] ?? '') : ''
   const cyrillic = template?.inputLang === 'ru' && settings.cyrillicKeyboard
   const showPron = settings.showPronunciation && current !== undefined
-  const promptPron = showPron && template && fieldOf(current.note.noteTypeId, template.promptField)?.pronounce
-  const answerPron = showPron && template && fieldOf(current.note.noteTypeId, template.answerField)?.pronounce
+  const promptPron =
+    showPron && template && fieldOf(current.note.noteTypeId, template.promptField)?.pronounce === true
+  const answerPron =
+    showPron && template && fieldOf(current.note.noteTypeId, template.answerField)?.pronounce === true
 
   /* --- Laden ------------------------------------------------------- */
   useEffect(() => {
@@ -582,7 +584,7 @@ function Result({
     .map((key) => ({
       key,
       value: note.fields[key] ?? '',
-      pronounce: showPronunciation && Boolean(fieldOf(note.noteTypeId, key)?.pronounce),
+      pronounce: showPronunciation ? fieldOf(note.noteTypeId, key)?.pronounce : undefined,
     }))
     .filter((f) => f.value.trim())
 
@@ -620,8 +622,10 @@ function Result({
         <div className="mt-4 space-y-1.5 rounded-md border border-line-soft bg-surface px-3.5 py-3">
           {context.map((f) => (
             <div key={f.key} className="text-sm leading-snug text-muted">
-              <p className="font-ru text-text">{f.value}</p>
-              {f.pronounce && (
+              <p className="font-ru text-text">
+                <InlinePronunciation text={f.value} enabled={f.pronounce === 'inline'} />
+              </p>
+              {f.pronounce === true && (
                 <Pronunciation text={f.value} size="sm" className="mt-0.5 justify-start" />
               )}
             </div>

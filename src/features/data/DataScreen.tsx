@@ -273,7 +273,7 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
         <Panel className="px-4">
           <Switch
             label="Aussprache anzeigen"
-            hint="Lautschrift zu russischen Wörtern und Beispielsätzen — überall dort, wo die Betonung markiert ist oder feststeht."
+            hint="Lautschrift zu russischen Wörtern, Beispielsätzen und Grammatikformen — beim Lernen, in der Deckliste und im Editor, überall dort, wo die Betonung markiert ist oder feststeht."
             checked={settings.showPronunciation}
             onChange={(v) => void saveSetting('showPronunciation', v)}
           />

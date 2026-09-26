@@ -23,7 +23,8 @@ import {
   updateDeck,
 } from '@/data/repo'
 import type { AppSettings, Deck, ID, Note } from '@/data/types'
-import { noteType } from '@/domain/notetypes'
+import { fieldOf, noteType } from '@/domain/notetypes'
+import { pronounce } from '@/domain/pronounce'
 import { normalize } from '@/domain/answer'
 import { dueLabel } from '@/lib/date'
 import { cn } from '@/lib/cn'
@@ -71,6 +72,8 @@ export function DeckDetail({
   const [confirmDeleteNotes, setConfirmDeleteNotes] = useState(false)
 
   const type = noteType(deck.noteTypeId)
+  const pronouncePrimary =
+    settings.showPronunciation && fieldOf(type.id, type.primaryField)?.pronounce === true
 
   const filtered = useMemo(() => {
     const q = normalize(query)
@@ -242,6 +245,7 @@ export function DeckDetail({
                 note={note}
                 primaryKey={type.primaryField}
                 secondaryKey={type.secondaryField}
+                pronouncePrimary={pronouncePrimary}
                 selecting={selecting}
                 selected={selected.has(note.id)}
                 onPress={() => (selecting ? toggle(note.id) : setEditing(note.id))}
@@ -352,6 +356,7 @@ function NoteRow({
   note,
   primaryKey,
   secondaryKey,
+  pronouncePrimary,
   selecting,
   selected,
   onPress,
@@ -359,6 +364,7 @@ function NoteRow({
   note: Note
   primaryKey: string
   secondaryKey: string
+  pronouncePrimary: boolean
   selecting: boolean
   selected: boolean
   onPress: () => void
@@ -369,6 +375,11 @@ function NoteRow({
     : null
   const anySuspended = cards.some((c) => c.suspended)
   const anyNew = cards.some((c) => c.state === 0)
+  const primary = note.fields[primaryKey] ?? ''
+  const transcript = useMemo(
+    () => (pronouncePrimary ? pronounce(primary) : null),
+    [primary, pronouncePrimary],
+  )
 
   return (
     <button
@@ -390,7 +401,10 @@ function NoteRow({
       )}
       <span className="min-w-0 flex-1">
         <span className="font-ru block truncate text-[15px] font-medium">
-          {note.fields[primaryKey] || '—'}
+          {primary || '—'}
+          {transcript && (
+            <span className="ml-1.5 font-sans text-[13px] font-normal text-faint">[{transcript}]</span>
+          )}
         </span>
         <span className="block truncate text-[13px] text-muted">
           {note.fields[secondaryKey]?.replace(/\|/g, ' · ') || '—'}

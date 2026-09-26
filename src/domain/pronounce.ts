@@ -402,3 +402,30 @@ export function unstressedWords(text: string): string[] {
   })
   return out
 }
+
+/** Zusammenhängender russischer Abschnitt: Wörter, getrennt nur durch Leerraum oder Bindestrich. */
+const CYRILLIC_RUN = /[Ѐ-ӿ][Ѐ-ӿ\p{M}]*(?:[\s-]+[Ѐ-ӿ][Ѐ-ӿ\p{M}]*)*/gu
+
+export interface Annotated {
+  text: string
+  /** Lautschrift zu diesem Abschnitt, `null` bei Nicht-Russischem oder fehlender Betonung. */
+  pron: string | null
+}
+
+/**
+ * Mischtext wie „m., Pl. лю́ди“ in Abschnitte zerlegen; jeder russische
+ * Abschnitt bekommt seine eigene Lautschrift. Satzzeichen trennen Abschnitte,
+ * damit „сказа́ть, говори́ть“ zwei Einträge ergibt. Zusammengesetzt ergeben die
+ * Abschnitte wieder genau den Eingabetext.
+ */
+export function annotate(text: string): Annotated[] {
+  const out: Annotated[] = []
+  let last = 0
+  for (const m of (text ?? '').matchAll(CYRILLIC_RUN)) {
+    if (m.index > last) out.push({ text: text.slice(last, m.index), pron: null })
+    out.push({ text: m[0], pron: pronounce(m[0]) })
+    last = m.index + m[0].length
+  }
+  if (last < (text ?? '').length) out.push({ text: text.slice(last), pron: null })
+  return out
+}

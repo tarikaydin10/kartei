@@ -84,7 +84,9 @@ scripts/        make-starter.mjs, make-icons.mjs, deploy.mjs
   hochsetzen, sonst erreicht die Korrektur niemanden, der das Deck schon hat.
 - **Neuer Kartentyp** = ein Eintrag in `domain/notetypes.ts` (Felder +
   Vorlagen). Kein neuer Code-Pfad nötig; genau dafür ist die Struktur da.
-  `pronounce: true` an einem Feld schaltet die Lautschrift dafür ein.
+  `pronounce: true` an einem Feld schaltet die Lautschrift dafür ein,
+  `pronounce: 'inline'` bei Mischtext (Grammatik) nur für die russischen
+  Stellen, jeweils direkt dahinter (`annotate`).
 - **Neuer Lernmodus** = ein Eintrag in `STUDY_MODES` und ein Fall in
   `pickCards` (`domain/session.ts`). `practice: true` heißt: ins Log, nicht
   in die Planung.

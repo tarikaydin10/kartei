@@ -6,14 +6,14 @@ import { createNote, deleteNote, updateNote, cardsOfNote } from '@/data/repo'
 import type { AppSettings, Deck, ID, NoteTypeId } from '@/data/types'
 import { emptyFields, missingRequired, noteType } from '@/domain/notetypes'
 import { normalize } from '@/domain/answer'
-import { unstressedWords } from '@/domain/pronounce'
+import { annotate, unstressedWords } from '@/domain/pronounce'
 import { Button } from '@/ui/primitives'
 import { Input, Label, Textarea } from '@/ui/Field'
 import { Sheet } from '@/ui/Sheet'
 import { useToast } from '@/ui/Toast'
 import { cn } from '@/lib/cn'
 import { CyrillicKeyboard } from '@/features/study/CyrillicKeyboard'
-import { Pronunciation } from '@/features/study/Pronunciation'
+import { InlinePronunciation, Pronunciation } from '@/features/study/Pronunciation'
 
 type El = HTMLInputElement | HTMLTextAreaElement
 
@@ -248,7 +248,7 @@ export function NoteEditor({
                 <Input {...shared} label={`${f.label}${f.required ? ' *' : ''}`} hint={f.hint} />
               )}
               {f.pronounce && settings.showPronunciation && (
-                <PronunciationPreview value={fields[f.key] ?? ''} />
+                <PronunciationPreview value={fields[f.key] ?? ''} inline={f.pronounce === 'inline'} />
               )}
               {f.key === type.identityField && duplicate && (
                 <p className="mt-1.5 flex items-start gap-1.5 text-xs text-warn">
@@ -351,8 +351,9 @@ export function NoteEditor({
  * Lautschrift live unter dem Feld — und sonst der Hinweis, woran es fehlt.
  * Nebenbei die beste Kontrolle, ob die Betonung richtig gesetzt ist.
  */
-function PronunciationPreview({ value }: { value: string }) {
+function PronunciationPreview({ value, inline }: { value: string; inline: boolean }) {
   const missing = useMemo(() => unstressedWords(value), [value])
+  const annotated = useMemo(() => inline && annotate(value).some((a) => a.pron), [value, inline])
   if (!value.trim()) return null
   if (missing.length > 0) {
     return (
@@ -363,6 +364,14 @@ function PronunciationPreview({ value }: { value: string }) {
         „Betonung“), etwa <span className="font-ru text-muted">молоко́</span>.
       </p>
     )
+  }
+  if (inline) {
+    // Mischtext: so, wie er beim Lernen erscheint — nur wenn Russisches drinsteht.
+    return annotated ? (
+      <p className="font-ru mt-1.5 text-xs text-muted">
+        <InlinePronunciation text={value} />
+      </p>
+    ) : null
   }
   return <Pronunciation text={value} size="sm" className="mt-1.5 justify-start" />
 }

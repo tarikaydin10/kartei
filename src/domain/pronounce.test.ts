@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pronounce, unstressedWords } from './pronounce'
+import { annotate, pronounce, unstressedWords } from './pronounce'
 
 describe('pronounce — wann es eine Lautschrift gibt', () => {
   it('braucht bei mehrsilbigen Wörtern eine bekannte Betonung', () => {
@@ -176,5 +176,45 @@ describe('pronounce — Sätze', () => {
 
   it('gibt nichts aus, wenn im Satz eine Betonung fehlt', () => {
     expect(pronounce('Я люблю тебя')).toBeNull()
+  })
+})
+
+describe('annotate — Lautschrift in Mischtext', () => {
+  const pairs = (text: string) => annotate(text).map((a) => [a.text, a.pron])
+
+  it('versieht nur die russischen Stellen mit Lautschrift', () => {
+    expect(pairs('m., Pl. лю́ди')).toEqual([
+      ['m., Pl. ', null],
+      ['лю́ди', 'ljúdi'],
+    ])
+    expect(pairs('förmlich; du-Form: извини́')).toEqual([
+      ['förmlich; du-Form: ', null],
+      ['извини́', 'iswiní'],
+    ])
+  })
+
+  it('trennt an Satzzeichen, hält Wendungen aber zusammen', () => {
+    expect(pairs('сказа́ть, говори́ть')).toEqual([
+      ['сказа́ть', 'skasát\''],
+      [', ', null],
+      ['говори́ть', 'gawarít\''],
+    ])
+    expect(pairs('Präp. + в шко́ле')).toEqual([
+      ['Präp. + ', null],
+      ['в шко́ле', 'f schkólje'],
+    ])
+  })
+
+  it('lässt Stellen ohne Betonung ohne Lautschrift', () => {
+    expect(pairs('Pl. столы')).toEqual([
+      ['Pl. ', null],
+      ['столы', null],
+    ])
+  })
+
+  it('setzt sich wieder zum Eingabetext zusammen', () => {
+    for (const s of ['', 'm., dekliniert wie ein Femininum', 'f., Gen. ма́тери (Sg.)', 'дом']) {
+      expect(annotate(s).map((a) => a.text).join('')).toBe(s)
+    }
   })
 })

@@ -108,6 +108,10 @@ Betonung feststeht — Betonungszeichen, `ё` oder ein einziger Vokal. Eine
 geratene Aussprache wäre schlimmer als keine; der Editor sagt, wo das Zeichen
 fehlt.
 
+Zu sehen ist sie beim Lernen (Wort, Antwort, Beispielsatz), in der Deckliste,
+im Editor und in der Grammatik: Dort steht die Lautschrift direkt hinter jeder
+russischen Form, etwa „m., Pl. лю́ди [ljúdi]“.
+
 - Betonung als Akzent, Vokalreduktion (unbetontes о → a, е/я → i).
 - Weiche Konsonanten (`njet`, `djen'`), Auslautverhärtung (`chljep`),
   Stimmangleichung (`ftschirá`), Präpositionen verschmelzen mit dem Folgewort.
