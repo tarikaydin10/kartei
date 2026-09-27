@@ -1,0 +1,83 @@
+# Jeder Push auf main: prüfen, bauen, auf den VPS deployen.
+#
+# Der Deploy ist derselbe wie lokal (`scripts/deploy.mjs`): packen, per scp
+# hochladen, Symlink atomar umlegen. Zugangsdaten kommen aus den Repository-
+# Secrets (Settings → Secrets and variables → Actions), siehe deploy/README.md:
+#
+#   DEPLOY_HOST          IP oder Hostname des VPS (kein ssh-config-Alias)
+#   DEPLOY_USER          SSH-Benutzer, z. B. deploy
+#   DEPLOY_SSH_KEY       privater Schlüssel, dessen .pub beim Benutzer liegt
+#   DEPLOY_KNOWN_HOSTS   Ausgabe von `ssh-keyscan <host>` — pinnt den Hostkey
+#   DEPLOY_PORT          optional, Standard 22
+#   DEPLOY_ROOT          optional, Standard /srv/static/kartei
+#
+# Solange DEPLOY_HOST fehlt, wird nur geprüft und gebaut, nicht deployt.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Nie zwei Deploys gleichzeitig; ein neuerer Push wartet, bricht aber keinen
+# laufenden Upload ab.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+      - name: Deploy überspringen (keine Zugangsdaten)
+        if: env.DEPLOY_HOST == ''
+        run: echo "::warning::DEPLOY_HOST ist nicht gesetzt — gebaut, aber nicht deployt. Siehe deploy/README.md."
+
+      - name: SSH einrichten
+        if: env.DEPLOY_HOST != ''
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$DEPLOY_SSH_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
+            echo "::error::DEPLOY_SSH_KEY und DEPLOY_KNOWN_HOSTS müssen gesetzt sein."
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<'EOF'
+          Host *
+            IdentityFile ~/.ssh/id_deploy
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+          EOF
+
+      - name: Deploy
+        if: env.DEPLOY_HOST != ''
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+          DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT || '/srv/static/kartei' }}
+        run: node scripts/deploy.mjs

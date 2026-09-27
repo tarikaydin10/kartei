@@ -134,6 +134,41 @@ Baut, packt, lädt hoch, hängt die Release ein, räumt alte auf. Braucht nur
 `ssh`, `scp` und `tar` — alles auf Windows 10+ dabei. Auf dem Server läuft
 weder Node noch npm.
 
+## Automatisch bei jedem Push auf `main`
+
+`.github/workflows/deploy.yml` prüft (Typecheck, Lint, Tests), baut und ruft
+dann dasselbe `scripts/deploy.mjs` auf. Schlägt ein Test fehl, wird nicht
+deployt. Solange die Secrets fehlen, wird nur geprüft und gebaut.
+
+Einmalig einrichten:
+
+```bash
+# 1. Eigenen Schlüssel nur für GitHub erzeugen (ohne Passphrase)
+ssh-keygen -t ed25519 -N '' -C github-deploy-kartei -f kartei-deploy
+
+# 2. Öffentlichen Teil beim deploy-Benutzer auf dem Server eintragen
+ssh-copy-id -i kartei-deploy.pub deploy@kartei-vps
+
+# 3. Hostkey des Servers festhalten (echte IP bzw. Hostname, kein Alias)
+ssh-keyscan -p 22 <IP-der-CX23>
+```
+
+Dann auf GitHub unter **Settings → Secrets and variables → Actions → New
+repository secret** anlegen:
+
+| Secret               | Inhalt                                                  |
+| -------------------- | ------------------------------------------------------- |
+| `DEPLOY_HOST`        | IPv4 der CX23 (der Alias `kartei-vps` gilt nur lokal)   |
+| `DEPLOY_USER`        | `deploy`                                                |
+| `DEPLOY_SSH_KEY`     | Inhalt von `kartei-deploy` (privater Teil, komplett)    |
+| `DEPLOY_KNOWN_HOSTS` | Ausgabe von `ssh-keyscan` aus Schritt 3                 |
+| `DEPLOY_PORT`        | optional, nur wenn nicht 22                             |
+| `DEPLOY_ROOT`        | optional, nur wenn nicht `/srv/static/kartei`           |
+
+Danach die lokale Datei `kartei-deploy` löschen — sie wird nur noch auf GitHub
+gebraucht. Den ersten Lauf ohne neuen Commit startet **Actions → Deploy → Run
+workflow**.
+
 ## Rollback
 
 ```bash

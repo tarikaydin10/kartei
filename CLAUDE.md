@@ -23,8 +23,10 @@ Leitprinzip: **offline jetzt, sync-ready für später.**
 | Tests      | Vitest                        |
 | Lint       | oxlint                        |
 
-Der Build ist ein statisches Bundle — host-agnostisch, per FTPS deploybar
-(`scripts/deploy.mjs`, identisch zu `Trainer`).
+Der Build ist ein statisches Bundle — host-agnostisch. Jeder Push auf `main`
+wird per GitHub Actions geprüft, gebaut und deployt
+(`.github/workflows/deploy.yml` → `scripts/deploy.mjs`, scp + Symlink auf den
+VPS, siehe `deploy/README.md`). Was auf `main` landet, ist also live.
 
 ## Architekturprinzipien (verbindlich)
 

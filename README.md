@@ -54,6 +54,10 @@ Symlink um — atomar, mit den letzten drei Releases als Rollback. Auf dem Serve
 läuft kein Node und kein npm; Caddy liefert die Dateien aus.
 `DEPLOY_DRY_RUN=1` zeigt vorher, was passieren würde.
 
+**Automatisch:** Jeder Push auf `main` läuft durch GitHub Actions — Typecheck,
+Lint, Tests, Build, dann derselbe Deploy. Die Zugangsdaten liegen als
+Repository-Secrets; welche, steht in [deploy/README.md](deploy/README.md).
+
 Zwei Dinge sind nicht optional:
 
 - **HTTPS**, sonst gibt es keinen Service Worker und keine Installation auf dem
