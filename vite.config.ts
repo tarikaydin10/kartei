@@ -35,7 +35,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,json}'],
+        // `md` für kartei-format.md: Sonst beantwortet navigateFallback den Aufruf
+        // im Browser mit der App statt mit der Formatbeschreibung.
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,json,md}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         // Der Sync-Server liegt unter derselben Origin — nie aus dem Cache.

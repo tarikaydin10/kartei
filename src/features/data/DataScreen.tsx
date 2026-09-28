@@ -190,6 +190,13 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
             disabled={busy}
           />
         </Panel>
+        <p className="mt-2 px-1 text-[11px] text-faint">
+          Deck per KI erzeugen: Die{' '}
+          <a href="/kartei-format.md" target="_blank" rel="noreferrer" className="underline">
+            Formatbeschreibung
+          </a>{' '}
+          einem Sprachmodell geben, das JSON hier importieren.
+        </p>
         <input
           ref={fileInput}
           type="file"
