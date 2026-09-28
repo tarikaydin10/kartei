@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { BarChart3, House, Layers, SlidersHorizontal } from 'lucide-react'
 import { ensureDeviceId, ensureSeed, listDecks, type StudyRequest } from '@/data/repo'
+import { startAutoSync } from '@/data/useSync'
 import { useSettings } from '@/data/useSettings'
 import type { ID } from '@/data/types'
 import { cn } from '@/lib/cn'
@@ -65,6 +66,11 @@ function Shell() {
       void requestPersistence()
     })()
   }, [])
+
+  // Abgleich mit anderen Geräten — nur, wenn einer eingerichtet ist.
+  useEffect(() => {
+    if (ready) return startAutoSync()
+  }, [ready])
 
   if (!ready || decks === undefined) {
     return (

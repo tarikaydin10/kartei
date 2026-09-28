@@ -7,9 +7,14 @@
  *   1. Upsert per UUID, und
  *   2. Fallback-Deduplizierung über das Identitätsfeld des Notiztyps,
  *      wenn eine Datei keine bekannten IDs mitbringt (z. B. eine CSV).
+ *
+ * Und geräteübergreifend: Fehlen IDs in der Datei, werden sie aus Deckname
+ * bzw. Deck + Identitätsfeld abgeleitet (`stableId`), Karten-IDs aus Notiz
+ * und Richtung (`cardIdFor`). Dieselbe Datei auf zwei Geräten importiert
+ * ergibt dieselben Datensätze — nach dem Sync ein Deck, nicht zwei.
  */
 import { db } from '@/data/db'
-import { newId } from '@/lib/id'
+import { cardIdFor, newId, stableId } from '@/lib/id'
 import { normalize } from '@/domain/answer'
 import { defaultTemplateIds, missingRequired, noteType } from '@/domain/notetypes'
 import { initialState, replay } from '@/domain/srs'
@@ -52,6 +57,21 @@ function identityKey(deckId: ID, noteTypeId: NoteTypeId, fields: Record<string, 
   return `${deckId}|${noteTypeId}|${normalize(fields[key] ?? '')}`
 }
 
+/** ID für eine Notiz ohne ID in der Datei — auf jedem Gerät dieselbe. */
+export function stableNoteId(deckId: ID, noteTypeId: NoteTypeId, fields: Record<string, string>): ID {
+  return stableId('note', identityKey(deckId, noteTypeId, fields))
+}
+
+export function stableDeckId(name: string): ID {
+  return stableId('deck', name.trim().toLowerCase())
+}
+
+function sameContent(a: Pick<Note, 'fields' | 'tags'>, b: Pick<Note, 'fields' | 'tags'>): boolean {
+  const keys = new Set([...Object.keys(a.fields), ...Object.keys(b.fields)])
+  for (const k of keys) if ((a.fields[k] ?? '') !== (b.fields[k] ?? '')) return false
+  return a.tags.length === b.tags.length && a.tags.every((t) => b.tags.includes(t))
+}
+
 export async function importExportFile(
   file: ExportFile,
   opts: ImportOptions = {},
@@ -71,21 +91,28 @@ export async function importExportFile(
 
     if (!opts.targetDeckId) {
       for (const d of file.decks) {
-        if (d.id && byId.has(d.id)) {
-          const local = byId.get(d.id)!
+        const sameName = byName.get(d.name.trim().toLowerCase())
+        // Ohne ID in der Datei hat ein lebendes Deck gleichen Namens Vorrang
+        // vor einem gelöschten mit der abgeleiteten ID.
+        if (!d.id && sameName) {
+          deckMap.set(d.id, sameName.id)
+          continue
+        }
+        const id = d.id || stableDeckId(d.name)
+        if (byId.has(id)) {
+          const local = byId.get(id)!
           // Ein zuvor gelöschtes Deck wird durch den Import wiederbelebt.
           if (local.deletedAt) await db.decks.put({ ...local, deletedAt: null, updatedAt: now })
           deckMap.set(d.id, local.id)
           continue
         }
-        const sameName = byName.get(d.name.trim().toLowerCase())
         if (sameName) {
           deckMap.set(d.id, sameName.id)
           continue
         }
         const deck: Deck = {
           ...d,
-          id: d.id || newId(),
+          id,
           deletedAt: null,
           sortOrder: existingDecks.length + report.decksCreated,
         }
@@ -151,7 +178,8 @@ export async function importExportFile(
 
       if (local) {
         noteIdMap.set(incoming.id, local.id)
-        if (incoming.updatedAt > local.updatedAt || local.deletedAt) {
+        const changed = !sameContent(incoming, local) || local.deletedAt
+        if (changed && (incoming.updatedAt > local.updatedAt || local.deletedAt)) {
           await db.notes.put({
             ...local,
             fields: incoming.fields,
@@ -170,17 +198,22 @@ export async function importExportFile(
       }
 
       const deckId = resolveDeck(incoming.deckId)
-      const dupe = identityIndex.get(identityKey(deckId, incoming.noteTypeId, incoming.fields))
+      const id = incoming.id || stableNoteId(deckId, incoming.noteTypeId, incoming.fields)
+      // Die abgeleitete ID kann schon vergeben sein: an eine gelöschte Notiz
+      // (wird wiederbelebt) oder an dieselbe, inzwischen verschobene Notiz.
+      const prior = incoming.id ? undefined : await db.notes.get(id)
+      const dupe =
+        identityIndex.get(identityKey(deckId, incoming.noteTypeId, incoming.fields)) ??
+        (prior && !prior.deletedAt ? prior : undefined)
       if (dupe) {
         noteIdMap.set(incoming.id, dupe.id)
         merged.add(incoming.id)
-        if (incoming.updatedAt > dupe.updatedAt) {
-          await db.notes.put({
-            ...dupe,
-            fields: { ...dupe.fields, ...incoming.fields },
-            tags: [...new Set([...dupe.tags, ...incoming.tags])],
-            updatedAt: now,
-          })
+        const next = {
+          fields: { ...dupe.fields, ...incoming.fields },
+          tags: [...new Set([...dupe.tags, ...incoming.tags])],
+        }
+        if (incoming.updatedAt > dupe.updatedAt && !sameContent(next, dupe)) {
+          await db.notes.put({ ...dupe, ...next, updatedAt: now })
           report.notesUpdated++
         } else {
           report.notesUnchanged++
@@ -190,13 +223,13 @@ export async function importExportFile(
 
       const note: Note = {
         ...incoming,
-        id: incoming.id || newId(),
+        id,
         deckId,
         deletedAt: null,
-        createdAt: incoming.createdAt || now,
-        updatedAt: incoming.updatedAt || now,
+        createdAt: prior?.createdAt ?? (incoming.createdAt || now),
+        updatedAt: prior ? now : incoming.updatedAt || now,
       }
-      await db.notes.add(note)
+      await db.notes.put(note)
       identityIndex.set(identityKey(deckId, note.noteTypeId, note.fields), note)
       noteIdMap.set(incoming.id, note.id)
       needCards.push({
@@ -208,6 +241,8 @@ export async function importExportFile(
 
     /* --- 3. Fortschritt (Karten) ----------------------------------- */
     const touchedCards = new Set<ID>()
+    /** Karten-ID in der Datei -> lokale Karten-ID (ältere Backups: Zufalls-IDs). */
+    const cardIdMap = new Map<ID, ID>()
 
     if (includeProgress && file.cards?.length) {
       for (const incoming of file.cards) {
@@ -218,18 +253,20 @@ export async function importExportFile(
         const note = await db.notes.get(localNoteId)
         if (!note) continue
 
-        const local = incoming.id ? await db.cards.get(incoming.id) : undefined
+        const id = cardIdFor(localNoteId, incoming.templateId)
+        if (incoming.id) cardIdMap.set(incoming.id, id)
+        const local = await db.cards.get(id)
         if (local && local.updatedAt >= incoming.updatedAt) continue
 
         await db.cards.put({
           ...incoming,
-          id: incoming.id || newId(),
+          id,
           noteId: localNoteId,
           deckId: note.deckId,
           deletedAt: incoming.deletedAt ?? null,
           suspended: Boolean(incoming.suspended),
         })
-        touchedCards.add(incoming.id)
+        touchedCards.add(id)
         if (local) report.cardsRestored++
         else report.cardsCreated++
       }
@@ -246,7 +283,7 @@ export async function importExportFile(
           await db.cards.put({ ...revive, deletedAt: null, updatedAt: now })
         } else {
           await db.cards.add({
-            id: newId(),
+            id: cardIdFor(note.id, templateId),
             createdAt: note.createdAt,
             updatedAt: now,
             deletedAt: null,
@@ -267,11 +304,12 @@ export async function importExportFile(
       for (const r of file.reviews) {
         if (!r.id || !r.cardId) continue
         if (merged.has(r.noteId)) continue
-        const card = await db.cards.get(r.cardId)
+        const card = await db.cards.get(cardIdMap.get(r.cardId) ?? r.cardId)
         if (!card) continue
         if (await db.reviews.get(r.id)) continue
         const review: Review = {
           ...r,
+          cardId: card.id,
           noteId: card.noteId,
           deckId: card.deckId,
           wasNew: Boolean(r.wasNew),
@@ -279,7 +317,7 @@ export async function importExportFile(
           verdict: r.verdict ?? 'manual',
         }
         await db.reviews.add(review)
-        affected.add(r.cardId)
+        affected.add(card.id)
         report.reviewsImported++
       }
       for (const id of affected) touchedCards.add(id)
@@ -294,7 +332,8 @@ export async function importExportFile(
       const reviews = await db.reviews.where('cardId').equals(cardId).toArray()
       if (reviews.length === 0) continue
       const state = replay(card.createdAt, reviews)
-      await db.cards.put({ ...card, ...state, updatedAt: now })
+      // Nur der Cache ändert sich, kein `updatedAt` (siehe data/repo.ts).
+      await db.cards.put({ ...card, ...state })
     }
   })
 
@@ -340,7 +379,7 @@ export function rowsToNotes(
         : []
 
     out.push({
-      id: newId(),
+      id: stableNoteId(deckId, noteTypeId, fields),
       createdAt: now,
       updatedAt: now,
       deletedAt: null,
