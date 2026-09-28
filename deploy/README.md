@@ -140,7 +140,63 @@ weder Node noch npm.
 dann dasselbe `scripts/deploy.mjs` auf. Schlägt ein Test fehl, wird nicht
 deployt. Solange die Secrets fehlen, wird nur geprüft und gebaut.
 
-Einmalig einrichten:
+### Einrichten ohne SSH (Hetzner-Konsole)
+
+Wenn du gerade nicht per SSH auf den Server kommst: Alles Nötige holt sich der
+Server selbst von GitHub, in der Konsole tippst du genau eine Zeile.
+
+**1. Schlüsselpaar erzeugen** — auf deinem Rechner (PowerShell, Terminal),
+bei der Frage nach der Passphrase zweimal Enter:
+
+```bash
+ssh-keygen -t ed25519 -C github-deploy-kartei -f kartei-deploy
+```
+
+Das ergibt `kartei-deploy` (privat, geheim) und `kartei-deploy.pub`
+(öffentlich, darf ins Repo).
+
+**2. Öffentlichen Schlüssel ins Repo** — Inhalt von `kartei-deploy.pub` als
+`deploy/github-deploy.pub` auf `main` committen (auf GitHub: *Add file →
+Create new file*). Der private Teil kommt nie ins Repo.
+
+**3. In der Hetzner-Konsole** (Cloud Console → Server → `>_` Konsole) als
+`root` anmelden und ausführen:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tarikaydin10/kartei/main/deploy/bootstrap.sh | bash -s -- --caddy
+```
+
+`deploy/bootstrap.sh` legt den Benutzer `deploy` an, trägt den Schlüssel ein,
+legt `/srv/static/kartei` an, prüft sshd und `ufw`, legt die Caddy-Site ab und
+zeigt am Ende an, was in die Secrets gehört — darunter den Fingerabdruck des
+Servers (`SHA256:…`). Mehrfach ausführen schadet nicht. Ohne `--caddy` bleibt
+die Caddy-Konfiguration unangetastet.
+
+- Kein root-Passwort? Cloud Console → Server → *Rescue* → *Reset root password*.
+- Kommen in der Konsole `/`, `|` oder `-` falsch an, ist sie auf US-Tastatur
+  gestellt: erst `loadkeys de` tippen.
+
+**4. Secrets auf GitHub** (*Settings → Secrets and variables → Actions*):
+
+| Secret                    | Inhalt                                                 |
+| ------------------------- | ------------------------------------------------------ |
+| `DEPLOY_HOST`             | IPv4 des Servers (zeigt das Skript bzw. die Konsole)   |
+| `DEPLOY_USER`             | `deploy`                                               |
+| `DEPLOY_HOST_FINGERPRINT` | `SHA256:…` aus der Ausgabe des Skripts                 |
+| `DEPLOY_SSH_KEY`          | kompletter Inhalt der privaten Datei `kartei-deploy`   |
+
+Statt die lange `known_hosts`-Zeile abzutippen, reicht der Fingerabdruck: Der
+Workflow holt den Hostschlüssel selbst und bricht ab, wenn er nicht passt.
+
+**5. Hetzner Cloud Firewall** (falls eine am Server hängt): eingehend TCP 22
+erlauben. GitHub deployt von wechselnden Adressen; abgesichert ist der Zugang
+über den Schlüssel, nicht über die IP.
+
+**6. Testen:** *Actions → Deploy → Run workflow*. Danach deployt jeder Push
+und jeder Merge auf `main` von selbst. Die lokale Datei `kartei-deploy` kannst
+du löschen, sobald sie als Secret hinterlegt ist.
+
+### Einrichten mit SSH
 
 ```bash
 # 1. Eigenen Schlüssel nur für GitHub erzeugen (ohne Passphrase)
@@ -161,7 +217,7 @@ repository secret** anlegen:
 | `DEPLOY_HOST`        | IPv4 der CX23 (der Alias `kartei-vps` gilt nur lokal)   |
 | `DEPLOY_USER`        | `deploy`                                                |
 | `DEPLOY_SSH_KEY`     | Inhalt von `kartei-deploy` (privater Teil, komplett)    |
-| `DEPLOY_KNOWN_HOSTS` | Ausgabe von `ssh-keyscan` aus Schritt 3                 |
+| `DEPLOY_KNOWN_HOSTS` | Ausgabe von `ssh-keyscan` aus Schritt 3 (oder `DEPLOY_HOST_FINGERPRINT`, siehe oben) |
 | `DEPLOY_PORT`        | optional, nur wenn nicht 22                             |
 | `DEPLOY_ROOT`        | optional, nur wenn nicht `/srv/static/kartei`           |
 

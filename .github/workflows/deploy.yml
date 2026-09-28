@@ -8,6 +8,11 @@
 #   DEPLOY_USER          SSH-Benutzer, z. B. deploy
 #   DEPLOY_SSH_KEY       privater Schlüssel, dessen .pub beim Benutzer liegt
 #   DEPLOY_KNOWN_HOSTS   Ausgabe von `ssh-keyscan <host>` — pinnt den Hostkey
+#   DEPLOY_HOST_FINGERPRINT
+#                        alternativ zu DEPLOY_KNOWN_HOSTS: der Fingerabdruck
+#                        „SHA256:…“ des ed25519-Hostschlüssels, wie ihn
+#                        deploy/bootstrap.sh ausgibt. Der Workflow holt den
+#                        Schlüssel dann selbst und bricht ab, wenn er nicht passt.
 #   DEPLOY_PORT          optional, Standard 22
 #   DEPLOY_ROOT          optional, Standard /srv/static/kartei
 #
@@ -34,6 +39,7 @@ jobs:
     timeout-minutes: 15
     env:
       DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -57,15 +63,36 @@ jobs:
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_HOST_FINGERPRINT: ${{ secrets.DEPLOY_HOST_FINGERPRINT }}
         run: |
-          if [ -z "$DEPLOY_SSH_KEY" ] || [ -z "$DEPLOY_KNOWN_HOSTS" ]; then
-            echo "::error::DEPLOY_SSH_KEY und DEPLOY_KNOWN_HOSTS müssen gesetzt sein."
+          if [ -z "$DEPLOY_SSH_KEY" ]; then
+            echo "::error::DEPLOY_SSH_KEY muss gesetzt sein."
             exit 1
           fi
           install -m 700 -d ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          if [ -n "$DEPLOY_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          elif [ -n "$DEPLOY_HOST_FINGERPRINT" ]; then
+            # Schlüssel holen, aber nur mit passendem Fingerabdruck übernehmen —
+            # sonst könnte sich jemand dazwischen als Server ausgeben.
+            ssh-keyscan -p "$DEPLOY_PORT" -t ed25519 "$DEPLOY_HOST" > /tmp/hostkey 2>/dev/null || true
+            actual="$(ssh-keygen -lf /tmp/hostkey 2>/dev/null | awk '{print $2}')"
+            expected="$(printf '%s' "$DEPLOY_HOST_FINGERPRINT" | tr -d '[:space:]')"
+            if [ -z "$actual" ]; then
+              echo "::error::Server $DEPLOY_HOST:$DEPLOY_PORT per SSH nicht erreichbar (Firewall? sshd?)."
+              exit 1
+            fi
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::Hostschlüssel passt nicht: erwartet $expected, erhalten $actual. Abgebrochen."
+              exit 1
+            fi
+            mv /tmp/hostkey ~/.ssh/known_hosts
+          else
+            echo "::error::DEPLOY_KNOWN_HOSTS oder DEPLOY_HOST_FINGERPRINT muss gesetzt sein."
+            exit 1
+          fi
           cat > ~/.ssh/config <<'EOF'
           Host *
             IdentityFile ~/.ssh/id_deploy
@@ -78,6 +105,5 @@ jobs:
         if: env.DEPLOY_HOST != ''
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT || '22' }}
           DEPLOY_ROOT: ${{ secrets.DEPLOY_ROOT || '/srv/static/kartei' }}
         run: node scripts/deploy.mjs
