@@ -62,7 +62,7 @@ VPS, siehe `deploy/README.md`). Was auf `main` landet, ist also live.
 ```
 src/
 ├─ data/        Dexie-Schema, Repository, Typen, Settings-Hook, Sync-Engine
-├─ domain/      reine Logik: answer, srs, session, streak, notetypes, pronounce, sync
+├─ domain/      reine Logik: answer, srs, session, streak, feedback, notetypes, pronounce, sync
 ├─ io/          Import/Export: schema, importer, exporter, csv
 ├─ ui/          Primitives, Sheet, Field, Toast
 ├─ features/
@@ -104,6 +104,11 @@ public/kartei-format.md   Importformat für Menschen und LLMs (Test hält es akt
   in die Planung.
 - **Aussprache** (`domain/pronounce.ts`) liefert `null`, wenn bei einem
   mehrsilbigen Wort die Betonung fehlt. Nicht raten — lieber keine Lautschrift.
+- **Kommentare** (`domain/feedback.ts`) sind der eine trockene Satz unterm
+  Ergebnis. Neue Sätze kommen in die passende Liste dort, nicht in die UI.
+  Ton: knapp, freundlich-spöttisch, nie belehrend. Bei richtigen Antworten
+  nur, wenn es etwas zu sagen gibt (Serie, vorher falsche Karte sitzt) — sonst
+  `null`. Abschaltbar über `settings.quips`.
 
 ## Sync
 

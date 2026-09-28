@@ -22,6 +22,14 @@ import {
   type SelfGrade,
 } from '@/domain/srs'
 import { STUDY_MODES, isPractice, requeue, type SessionTally } from '@/domain/session'
+import {
+  NO_STREAKS,
+  advanceStreaks,
+  pickQuip,
+  rememberQuip,
+  type QuipOutcome,
+  type Streaks,
+} from '@/domain/feedback'
 import { fieldOf, noteType, templateOf } from '@/domain/notetypes'
 import {
   amendLastReview,
@@ -51,6 +59,16 @@ interface AnswerSnapshot {
   tally: SessionTally
   done: Set<ID>
   missed: Set<ID>
+  streaks: Streaks
+}
+
+/** Was der Kommentar zur Antwort wissen muss — fehlt bei „Ich hatte recht“. */
+interface AnswerDetail {
+  kind?: Exclude<QuipOutcome, 'wrong' | 'near' | 'correct' | 'retype'>
+  typed: string
+  durationMs: number
+  hintUsed: boolean
+  distance?: number
 }
 
 export function StudyScreen({
@@ -87,6 +105,15 @@ export function StudyScreen({
   const [done, setDone] = useState<Set<ID>>(new Set())
   /** Karten mit mindestens einer falschen oder knappen Antwort in dieser Session. */
   const [missed, setMissed] = useState<Set<ID>>(new Set())
+  /** Treffer- und Fehlerserie innerhalb der Session — für die Kommentare. */
+  const [streaks, setStreaks] = useState<Streaks>(NO_STREAKS)
+  /** Der trockene Satz zum Ergebnis, falls es einen gibt. */
+  const [quip, setQuip] = useState<string | null>(null)
+  /** Fehlversuche beim Abtippen der Lösung, mit passendem Kommentar. */
+  const [retypeMiss, setRetypeMiss] = useState<{ count: number; quip: string | null }>({
+    count: 0,
+    quip: null,
+  })
   const [tally, setTally] = useState<SessionTally>({
     done: 0,
     total: 0,
@@ -106,6 +133,8 @@ export function StudyScreen({
   const sessionStart = useRef(Date.now())
   const lastAnswer = useRef<AnswerSnapshot | null>(null)
   const pendingReview = useRef<Promise<Card> | null>(null)
+  /** Zuletzt gezeigte Kommentare — derselbe Satz soll nicht gleich wiederkommen. */
+  const recentQuips = useRef<string[]>([])
 
   const current = queue[pos]
   const type = current ? noteType(current.note.noteTypeId) : null
@@ -182,6 +211,8 @@ export function StudyScreen({
     setHeld(false)
     setSelfGrade(null)
     setOverruled(false)
+    setQuip(null)
+    setRetypeMiss({ count: 0, quip: null })
     setPos((p) => {
       const next = p + 1
       if (next >= queue.length) {
@@ -207,10 +238,36 @@ export function StudyScreen({
       write: (card: Card) => Promise<Card | undefined>,
       base: AnswerSnapshot,
       advance: boolean,
+      detail: AnswerDetail | null,
     ) => {
       const entry = base.queue[pos]
       if (!entry) return
       lastAnswer.current = base
+
+      // Der Kommentar steht sofort da — nicht erst, wenn die Antwort geschrieben ist.
+      const next = advanceStreaks(base.streaks, outcome)
+      setStreaks(next)
+      const tpl = templateOf(entry.note.noteTypeId, entry.card.templateId)
+      const line =
+        detail && settings.quips
+          ? pickQuip(
+              {
+                outcome: detail.kind ?? outcome,
+                streak: outcome === 'correct' ? next.ok : next.miss,
+                repeat: base.missed.has(entry.card.id),
+                hintUsed: detail.hintUsed,
+                durationMs: detail.durationMs,
+                typed: detail.typed,
+                answer: tpl ? (entry.note.fields[tpl.answerField] ?? '') : '',
+                prompt: tpl ? (entry.note.fields[tpl.promptField] ?? '') : '',
+                distance: detail.distance,
+                comeback: outcome === 'correct' && next.brokenMiss >= 3,
+              },
+              { recent: recentQuips.current },
+            )
+          : null
+      recentQuips.current = rememberQuip(recentQuips.current, line)
+      setQuip(line)
       const pending = write(entry.card).then((c) => c ?? entry.card)
       pendingReview.current = pending
       const updated = await pending
@@ -249,11 +306,11 @@ export function StudyScreen({
       }
       if (advance) advanceTimer.current = window.setTimeout(goNext, AUTO_ADVANCE_MS)
     },
-    [goNext, pos, practice],
+    [goNext, pos, practice, settings.quips],
   )
 
   const grade = useCallback(
-    (verdict: Verdict, typedValue: string) => {
+    (verdict: Verdict, typedValue: string, result: AnswerCheck, gaveUp = false) => {
       if (!current) return
       const duration = Date.now() - shownAt.current
       let rating = deriveRating(verdict, duration, answerRaw.length, current.card.state)
@@ -272,11 +329,18 @@ export function StudyScreen({
             deviceId: settings.deviceId,
             practice,
           }),
-        { queue, tally, done, missed },
+        { queue, tally, done, missed, streaks },
         verdict === 'correct',
+        {
+          kind: gaveUp ? 'gaveUp' : undefined,
+          typed: typedValue,
+          durationMs: duration,
+          hintUsed,
+          distance: result.distance,
+        },
       )
     },
-    [answerRaw.length, current, done, hintUsed, missed, practice, queue, settings.deviceId, settle, tally],
+    [answerRaw.length, current, done, hintUsed, missed, practice, queue, settings.deviceId, settle, streaks, tally],
   )
 
   /** Selbstbewertung: Antwort zeigen, Bewertung folgt von Hand. */
@@ -308,11 +372,17 @@ export function StudyScreen({
             deviceId: settings.deviceId,
             practice,
           }),
-        { queue, tally, done, missed },
+        { queue, tally, done, missed, streaks },
         true,
+        {
+          kind: g === 'again' ? 'selfAgain' : undefined,
+          typed,
+          durationMs: thinkMs.current,
+          hintUsed: false,
+        },
       )
     },
-    [current, done, missed, phase, practice, queue, settings.deviceId, settle, tally, typed],
+    [current, done, missed, phase, practice, queue, settings.deviceId, settle, streaks, tally, typed],
   )
 
   /**
@@ -335,6 +405,7 @@ export function StudyScreen({
       (card) => amendLastReview(card.id, { rating, verdict: 'manual' }),
       base,
       true,
+      null,
     )
   }, [check, clearAdvance, current, hintUsed, phase, settle])
 
@@ -346,7 +417,7 @@ export function StudyScreen({
     })
     setCheck(result)
     setPhase('result')
-    void grade(result.verdict, typed)
+    void grade(result.verdict, typed, result)
   }, [answerRaw, current, grade, phase, settings.ignoreCase, settings.ignoreYo, typed])
 
   const giveUp = useCallback(() => {
@@ -357,7 +428,7 @@ export function StudyScreen({
     })
     setCheck({ ...result, diff: [{ type: 'missing', text: result.best }] })
     setPhase('result')
-    void grade('wrong', typed)
+    void grade('wrong', typed, result, true)
   }, [answerRaw, current, grade, phase, settings.ignoreCase, settings.ignoreYo, typed])
 
   const continueFromResult = useCallback(() => {
@@ -389,12 +460,14 @@ export function StudyScreen({
       setTally(snap.tally)
       setDone(snap.done)
       setMissed(snap.missed)
+      setStreaks(snap.streaks)
       lastAnswer.current = null
     }
     setCheck(null)
     setNextDue(null)
     setSelfGrade(null)
     setOverruled(false)
+    setQuip(null)
     if (selfMode) {
       // Zurück zur aufgedeckten Karte — neu bewerten, nicht neu raten.
       setPhase('reveal')
@@ -446,6 +519,25 @@ export function StudyScreen({
       goNext()
     } else {
       haptic('bad')
+      const count = retypeMiss.count + 1
+      const line = settings.quips
+        ? pickQuip(
+            {
+              outcome: 'retype',
+              attempt: count,
+              streak: 0,
+              repeat: false,
+              hintUsed: false,
+              durationMs: 0,
+              typed,
+              answer: answerRaw,
+              prompt: promptText,
+            },
+            { recent: recentQuips.current },
+          )
+        : null
+      recentQuips.current = rememberQuip(recentQuips.current, line)
+      setRetypeMiss({ count, quip: line })
       setTyped('')
       inputRef.current?.focus()
     }
@@ -570,9 +662,16 @@ export function StudyScreen({
       >
         <div key={`${current.card.id}-${pos}`} className="animate-card-in w-full max-w-lg">
           {isRetype && (
-            <p className="mb-3 text-center text-xs font-medium tracking-wide text-warn uppercase">
-              Einmal richtig abtippen
-            </p>
+            <div className="mb-3 text-center">
+              <p className="text-xs font-medium tracking-wide text-warn uppercase">
+                Einmal richtig abtippen
+              </p>
+              {retypeMiss.quip && (
+                <p key={retypeMiss.count} className="animate-rise mt-1 text-sm text-muted">
+                  {retypeMiss.quip}
+                </p>
+              )}
+            </div>
           )}
 
           <div className="text-center">
@@ -601,6 +700,7 @@ export function StudyScreen({
               note={current.note}
               template={template}
               graded={selfGrade}
+              quip={quip}
               nextDue={nextDue}
               practice={practice}
               held={held}
@@ -642,6 +742,7 @@ export function StudyScreen({
             {revealed && check && phase === 'result' && (
               <Result
                 check={check}
+                quip={quip}
                 answerRaw={answerRaw}
                 note={current.note}
                 template={template}
@@ -751,6 +852,7 @@ export function StudyScreen({
 
 function Result({
   check,
+  quip,
   answerRaw,
   note,
   template,
@@ -764,6 +866,8 @@ function Result({
   onOverrule,
 }: {
   check: AnswerCheck
+  /** Der Satz zum Ergebnis — `null`, wenn es nichts zu sagen gibt. */
+  quip: string | null
   answerRaw: string
   note: StudyCard['note']
   template: NonNullable<ReturnType<typeof templateOf>>
@@ -823,6 +927,17 @@ function Result({
         </p>
       )}
 
+      {quip && (
+        <p
+          className={cn(
+            'mt-3 text-center text-sm leading-snug',
+            check.verdict === 'correct' ? 'text-ok' : 'text-muted',
+          )}
+        >
+          {quip}
+        </p>
+      )}
+
       {context.length > 0 && (
         <div className="mt-4 space-y-1.5 rounded-md border border-line-soft bg-surface px-3.5 py-3">
           {context.map((f) => (
@@ -879,6 +994,7 @@ function SelfAnswer({
   note,
   template,
   graded,
+  quip,
   nextDue,
   practice,
   held,
@@ -891,6 +1007,7 @@ function SelfAnswer({
   note: StudyCard['note']
   template: NonNullable<ReturnType<typeof templateOf>>
   graded: SelfGrade | null
+  quip: string | null
   nextDue: number | null
   practice: boolean
   held: boolean
@@ -957,6 +1074,17 @@ function SelfAnswer({
       {phase === 'reveal' && (
         <p className="text-center text-[11px] text-faint">
           Wie gut saß es? Ehrlich bewerten — davon hängt ab, wann die Karte wiederkommt.
+        </p>
+      )}
+
+      {phase === 'result' && quip && (
+        <p
+          className={cn(
+            'animate-rise text-center text-sm leading-snug',
+            graded === 'good' ? 'text-ok' : 'text-muted',
+          )}
+        >
+          {quip}
         </p>
       )}
 

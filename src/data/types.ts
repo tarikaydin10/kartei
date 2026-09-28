@@ -114,6 +114,8 @@ export interface AppSettings {
   retypeOnWrong: boolean
   haptics: boolean
   sound: boolean
+  /** Ein trockener Satz zum Ergebnis — vor allem, wenn es daneben war. */
+  quips: boolean
   /** Bildschirmtastatur ЙЦУКЕН statt Systemtastatur für kyrillische Eingabe. */
   cyrillicKeyboard: boolean
   /** Lautschrift zu russischen Wörtern, wo die Betonung feststeht. */
@@ -131,6 +133,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   retypeOnWrong: true,
   haptics: true,
   sound: false,
+  quips: true,
   cyrillicKeyboard: true,
   showPronunciation: true,
   lastBackupAt: null,

@@ -303,6 +303,12 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
             checked={settings.sound}
             onChange={(v) => void saveSetting('sound', v)}
           />
+          <Switch
+            label="Kommentare"
+            hint="Ein trockener Satz zum Ergebnis — vor allem, wenn es daneben war. Wer es nüchtern mag, schaltet ab."
+            checked={settings.quips}
+            onChange={(v) => void saveSetting('quips', v)}
+          />
         </Panel>
       </div>
 
