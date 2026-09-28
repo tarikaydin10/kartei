@@ -191,14 +191,69 @@ billiger.
 Aus demselben Grund eine **eigene Subdomain, kein Unterordner**: `start_url`,
 `scope` und der Service Worker gehen von der Wurzel aus.
 
-## Wenn der Sync-Server kommt
+## Sync-Server
 
-In `deploy/kartei.caddy` steckt der Block dafür schon auskommentiert. Dann:
+Damit mehrere Geräte denselben Stand haben, läuft neben den statischen Dateien
+ein kleiner Dienst: `server/` in diesem Repo. Node ohne Pakete, eine
+SQLite-Datei. Er speichert nur verschlüsselte Datensätze; lesen kann er sie
+nicht (der Schlüssel verlässt die Geräte nie).
 
-- ein Node-Prozess (systemd oder Container am `edge`-Netz) auf `127.0.0.1:8788`
-- `handle /api/*` in der Site-Datei aktivieren, **vor** dem catch-all `handle`
-- die Daten außerhalb von `/srv/static/kartei` ablegen, damit ein Deploy sie
-  nicht anfassen kann — wie `/var/lib/ryadom` bei rjadom
+### Einmalig (Variante B, Edge-Caddy)
 
-Die URL bleibt dieselbe. App und API teilen sich die Origin: kein CORS, ein
-Zertifikat, ein Hostname.
+```bash
+# 1. Verzeichnisse: Code für den Build, Daten außerhalb von /srv/static,
+#    damit kein Deploy sie anfasst (1000 = Benutzer `node` im Container)
+ssh root@kartei-vps 'mkdir -p /srv/kartei-sync /var/lib/kartei-sync \
+  && chown deploy:deploy /srv/kartei-sync && chown 1000:1000 /var/lib/kartei-sync'
+
+# 2. Code hochladen (von deinem Rechner aus, im Repo-Verzeichnis)
+scp server/Dockerfile server/store.ts server/app.ts server/main.ts deploy@kartei-vps:/srv/kartei-sync/
+```
+
+In `/srv/edge/docker-compose.yml` den Dienst ergänzen — im selben Compose wie
+der Edge-Caddy, damit er ihn unter `kartei-sync` erreicht:
+
+```yaml
+  kartei-sync:
+    build: /srv/kartei-sync
+    restart: unless-stopped
+    environment:
+      SYNC_MAX_SPACES: "5"   # wie viele Sync-Schlüssel angenommen werden
+    volumes:
+      - /var/lib/kartei-sync:/data
+```
+
+```bash
+cd /srv/edge && docker compose up -d --build kartei-sync
+
+# 3. Site-Datei mit dem /api-Block übernehmen und neu laden
+cp deploy/kartei.caddy /srv/edge/conf.d/kartei.caddy
+docker exec edge-caddy caddy reload --config /etc/caddy/Caddyfile
+
+# Prüfen
+curl https://kartei.klick-profi.de/api/sync/health   # {"ok":true}
+```
+
+Variante A (Caddy auf dem Host): denselben Container mit `-p 127.0.0.1:8788:8788`
+starten und in `kartei.caddy` `reverse_proxy 127.0.0.1:8788` eintragen.
+
+### Aktualisieren
+
+Der Server ändert sich selten und wird nicht automatisch deployt:
+
+```bash
+scp server/Dockerfile server/store.ts server/app.ts server/main.ts deploy@kartei-vps:/srv/kartei-sync/
+ssh root@kartei-vps 'cd /srv/edge && docker compose up -d --build kartei-sync'
+```
+
+### Sichern
+
+Alles liegt in `/var/lib/kartei-sync/kartei-sync.db` (plus `-wal`/`-shm`
+während des Betriebs). Ein Backup ist optional: Jedes verbundene Gerät hat den
+vollständigen Bestand und lädt ihn in einen leeren Server wieder hoch.
+
+`SYNC_MAX_SPACES` begrenzt, wie viele verschiedene Sync-Schlüssel der Server
+annimmt — Fremde können ihn so nicht als Speicher missbrauchen. Für dich allein
+reicht 1; ein paar mehr erlauben einen Neuanfang mit neuem Schlüssel.
+
+App und API teilen sich die Origin: kein CORS, ein Zertifikat, ein Hostname.
