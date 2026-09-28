@@ -5,6 +5,7 @@ import {
   deriveRating,
   fastThreshold,
   initialState,
+  overruleRating,
   previewDue,
   replay,
   selfOutcome,
@@ -151,5 +152,12 @@ describe('Selbstbewertung', () => {
     expect(selfOutcome('again')).toBe('wrong')
     expect(selfOutcome('hard')).toBe('near')
     expect(selfOutcome('good')).toBe('correct')
+  })
+})
+
+describe('overruleRating', () => {
+  it('„Ich hatte recht“ zählt als Gut, mit Hinweis höchstens als Schwer', () => {
+    expect(overruleRating(false)).toBe(3)
+    expect(overruleRating(true)).toBe(2)
   })
 })

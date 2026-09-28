@@ -34,8 +34,9 @@ VPS, siehe `deploy/README.md`). Was auf `main` landet, ist also live.
    mit Dexie. So kann ein Sync-Backend hinter dieselbe Schnittstelle, ohne die
    UI anzufassen.
 2. **Drei Ebenen: Note / Card / Review.** Inhalt, Lernrichtung und Lernereignis
-   sind getrennt. Reviews sind **append-only und unveränderlich** — die einzige
-   Ausnahme ist `undoLastReview`, dokumentiert an Ort und Stelle.
+   sind getrennt. Reviews sind **append-only und unveränderlich** — die einzigen
+   Ausnahmen sind `undoLastReview` und `amendLastReview` („Ich hatte recht“),
+   beide Sekunden nach der Antwort und dokumentiert an Ort und Stelle.
 3. **Der FSRS-Zustand auf der Karte ist Cache, nicht Wahrheit.** Er muss
    jederzeit über `replay(createdAt, reviews)` reproduzierbar bleiben. Wer den
    Zustand anfasst, ohne ein Review zu schreiben, bricht den späteren Sync.

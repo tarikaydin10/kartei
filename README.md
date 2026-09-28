@@ -6,7 +6,8 @@ her aber für jedes Thema gebaut.
 - **Offline.** Alles liegt lokal in IndexedDB. Kein Konto, kein Server, keine
   Netzabhängigkeit.
 - **Tippen statt Umdrehen.** Antworten werden geschrieben und zeichenweise
-  geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch.
+  geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch. Hat die Prüfung ein
+  Synonym verworfen, korrigiert „Ich hatte recht“ die Bewertung.
 - **Selbstbewertung für Wissen.** Der Kartentyp „Konzept“ (Frage, Antwort,
   Erklärung, Quelle) wird nicht zeichenweise geprüft: erst selbst formulieren,
   dann aufdecken und mit *Nicht gewusst / Mühsam / Gewusst* bewerten — für

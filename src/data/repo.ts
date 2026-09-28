@@ -551,6 +551,37 @@ export async function undoLastReview(cardId: ID): Promise<Card | undefined> {
   })
 }
 
+/**
+ * Letzte Antwort einer Karte umbewerten („Ich hatte recht“) und den Zustand aus
+ * dem Log neu berechnen. Die Antwort behält Zeitpunkt, Eingabe und Übungsflag;
+ * nur Bewertung und Urteil ändern sich.
+ *
+ * Zweite bewusste Ausnahme von „Reviews sind unveränderlich“, aus demselben
+ * Grund wie `undoLastReview`: Sekunden nach der Eingabe, vor jedem Sync. Das
+ * Review bekommt eine neue ID — ein anderes Urteil ist ein anderes Ereignis.
+ */
+export async function amendLastReview(
+  cardId: ID,
+  change: { rating: Rating; verdict: Review['verdict'] },
+  now = Date.now(),
+): Promise<Card | undefined> {
+  return db.transaction('rw', db.cards, db.reviews, async () => {
+    const card = await db.cards.get(cardId)
+    if (!card) return undefined
+    const reviews = await db.reviews.where('cardId').equals(cardId).toArray()
+    if (reviews.length === 0) return card
+    reviews.sort((a, b) => a.ts - b.ts)
+    const last = reviews.pop()!
+    const amended: Review = { ...last, id: newId(), rating: change.rating, verdict: change.verdict }
+    await db.reviews.delete(last.id)
+    await db.reviews.add(amended)
+    const state = replay(card.createdAt, [...reviews, amended])
+    const updated: Card = { ...card, ...state, updatedAt: now }
+    await db.cards.put(updated)
+    return updated
+  })
+}
+
 /* ------------------------------------------------------------------ *
  * Statistik
  * ------------------------------------------------------------------ */

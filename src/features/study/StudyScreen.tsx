@@ -15,6 +15,7 @@ import {
   SELF_GRADES,
   SELF_GRADE_LABEL,
   deriveRating,
+  overruleRating,
   previewDue,
   selfOutcome,
   selfRating,
@@ -23,6 +24,7 @@ import {
 import { STUDY_MODES, isPractice, requeue, type SessionTally } from '@/domain/session'
 import { fieldOf, noteType, templateOf } from '@/domain/notetypes'
 import {
+  amendLastReview,
   buildSession,
   cardState,
   recordReview,
@@ -80,6 +82,8 @@ export function StudyScreen({
   const [held, setHeld] = useState(false)
   /** Selbstbewertung der aktuellen Karte, sobald abgegeben. */
   const [selfGrade, setSelfGrade] = useState<SelfGrade | null>(null)
+  /** „Ich hatte recht“ wurde für die aktuelle Karte benutzt. */
+  const [overruled, setOverruled] = useState(false)
   const [done, setDone] = useState<Set<ID>>(new Set())
   /** Karten mit mindestens einer falschen oder knappen Antwort in dieser Session. */
   const [missed, setMissed] = useState<Set<ID>>(new Set())
@@ -177,6 +181,7 @@ export function StudyScreen({
     setHintUsed(false)
     setHeld(false)
     setSelfGrade(null)
+    setOverruled(false)
     setPos((p) => {
       const next = p + 1
       if (next >= queue.length) {
@@ -192,7 +197,8 @@ export function StudyScreen({
 
   /**
    * Eine Bewertung festschreiben und die Session nachziehen. `base` ist der
-   * Stand vor der Antwort: „Antwort zurücknehmen“ springt genau dorthin.
+   * Stand vor der Antwort: „Antwort zurücknehmen“ springt genau dorthin, und
+   * „Ich hatte recht“ rechnet von dort aus neu.
    */
   const settle = useCallback(
     async (
@@ -309,6 +315,29 @@ export function StudyScreen({
     [current, done, missed, phase, practice, queue, settings.deviceId, settle, tally, typed],
   )
 
+  /**
+   * „Ich hatte recht“: die Prüfung hat eine richtige Antwort verworfen. Die
+   * gespeicherte Antwort wird umbewertet, die Session vom Stand davor aus neu
+   * gerechnet — die Karte fliegt also auch wieder aus der Wiederholschleife.
+   */
+  const overrule = useCallback(async () => {
+    if (!current || phase !== 'result' || !check || check.verdict === 'correct') return
+    clearAdvance()
+    await pendingReview.current
+    const base = lastAnswer.current
+    if (!base) return
+    const rating = overruleRating(hintUsed)
+    setOverruled(true)
+    setCheck({ ...check, verdict: 'correct', lenient: false })
+    await settle(
+      'correct',
+      rating,
+      (card) => amendLastReview(card.id, { rating, verdict: 'manual' }),
+      base,
+      true,
+    )
+  }, [check, clearAdvance, current, hintUsed, phase, settle])
+
   const submit = useCallback(() => {
     if (!current || phase !== 'prompt') return
     const result = checkAnswer(typed, answerRaw, {
@@ -365,6 +394,7 @@ export function StudyScreen({
     setCheck(null)
     setNextDue(null)
     setSelfGrade(null)
+    setOverruled(false)
     if (selfMode) {
       // Zurück zur aufgedeckten Karte — neu bewerten, nicht neu raten.
       setPhase('reveal')
@@ -621,6 +651,8 @@ export function StudyScreen({
                 showPronunciation={settings.showPronunciation}
                 held={held}
                 onUndo={undo}
+                overruled={overruled}
+                onOverrule={typed.trim() ? () => void overrule() : undefined}
               />
             )}
 
@@ -728,6 +760,8 @@ function Result({
   showPronunciation,
   held,
   onUndo,
+  overruled,
+  onOverrule,
 }: {
   check: AnswerCheck
   answerRaw: string
@@ -739,6 +773,9 @@ function Result({
   showPronunciation: boolean
   held: boolean
   onUndo: () => void
+  overruled: boolean
+  /** Fehlt, wenn es nichts umzuwerten gibt (z. B. nach „Weiß ich nicht“). */
+  onOverrule?: () => void
 }) {
   const alternatives = displayForms(answerRaw).filter((f) => f !== check.best)
   const context = template.revealFields
@@ -763,6 +800,13 @@ function Result({
             </div>
           )}
         </div>
+      )}
+
+      {overruled && (
+        <p className="text-center text-xs text-muted">
+          Als richtig gewertet — hinterlegt ist:{' '}
+          <span className="font-ru font-medium">{check.best}</span>
+        </p>
       )}
 
       {check.verdict === 'correct' && check.lenient && (
@@ -804,6 +848,14 @@ function Result({
         <button onClick={onUndo} className="underline decoration-dotted hover:text-muted">
           Antwort zurücknehmen
         </button>
+        {check.verdict !== 'correct' && onOverrule && (
+          <>
+            <span>·</span>
+            <button onClick={onOverrule} className="underline decoration-dotted hover:text-muted">
+              Ich hatte recht
+            </button>
+          </>
+        )}
       </div>
 
       {held && (

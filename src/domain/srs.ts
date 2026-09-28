@@ -154,6 +154,15 @@ export function selfOutcome(grade: SelfGrade): 'correct' | 'near' | 'wrong' {
   return 'correct'
 }
 
+/**
+ * „Ich hatte recht“: die Prüfung hat eine richtige Antwort verworfen, etwa ein
+ * Synonym, das nicht in der Liste steht. Zählt als „Gut“, nie als „Leicht“ —
+ * und mit Hinweis wie sonst auch höchstens als „Schwer“.
+ */
+export function overruleRating(hintUsed: boolean): Rating {
+  return hintUsed ? 2 : 3
+}
+
 export function fastThreshold(answerLength: number): number {
   return Math.min(8000, 1200 + 200 * Math.max(1, answerLength))
 }
