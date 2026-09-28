@@ -6,7 +6,13 @@ her aber für jedes Thema gebaut.
 - **Offline.** Alles liegt lokal in IndexedDB. Kein Konto, kein Server, keine
   Netzabhängigkeit.
 - **Tippen statt Umdrehen.** Antworten werden geschrieben und zeichenweise
-  geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch.
+  geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch. Hat die Prüfung ein
+  Synonym verworfen, korrigiert „Ich hatte recht“ die Bewertung.
+- **Selbstbewertung für Wissen.** Der Kartentyp „Konzept“ (Frage, Antwort,
+  Erklärung, Quelle) wird nicht zeichenweise geprüft: erst selbst formulieren,
+  dann aufdecken und mit *Nicht gewusst / Mühsam / Gewusst* bewerten — für
+  Regeln, Architektur und alles, was sich in eigenen Worten richtig beantworten
+  lässt.
 - **FSRS.** Wiederholungsplanung über [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs),
   denselben Algorithmus, den auch Anki verwendet.
 - **Mehr als der Tagesplan.** Vorarbeiten, zusätzliche neue Karten, heute
@@ -17,8 +23,13 @@ her aber für jedes Thema gebaut.
   Stimme hat.
 - **Import/Export ohne Dubletten.** Ein versioniertes JSON und CSV/TSV mit
   Spaltenzuordnung. Derselbe Import zweimal ausgeführt ändert nichts.
-- **Sync-vorbereitet.** UUIDs, `updatedAt` und Tombstones sind von Anfang an da;
-  der Lernfortschritt liegt als append-only Event-Log vor.
+- **Mehrere Geräte.** Offline zuerst, abgeglichen im Hintergrund, sobald Netz da
+  ist. Kein Konto, sondern ein Sync-Schlüssel; die Inhalte sind Ende zu Ende
+  verschlüsselt, der Server kann sie nicht lesen. Lernfortschritt beider Geräte
+  wird vereinigt, nicht überschrieben.
+- **Decks per LLM.** [`public/kartei-format.md`](public/kartei-format.md)
+  beschreibt das Importformat so, dass jedes Sprachmodell daraus ein passendes
+  Deck erzeugen kann.
 
 ## Befehle
 
@@ -30,6 +41,8 @@ npm run typecheck
 npm run lint
 npm run test
 npm run deploy     # build + Upload auf den VPS (Zugangsdaten aus .env)
+
+node server/main.ts   # Sync-Server (Node ≥ 22.18), der Dev-Server leitet /api dorthin
 ```
 
 Hilfsskripte:
@@ -84,7 +97,7 @@ Eigenschaften:
 1. Ein aktualisiertes Deck lässt sich importieren, **ohne** den Lernfortschritt
    anzufassen.
 2. Ein Deck lässt sich ohne den eigenen Fortschritt weitergeben.
-3. Synchronisierung wird konfliktfrei: Reviews werden nur vereinigt, der
+3. Synchronisierung ist konfliktfrei: Reviews werden nur vereinigt, der
    Zustand danach neu berechnet.
 
 ## Lernen jenseits des Tagesplans
@@ -146,6 +159,6 @@ Online-Stimmen würden den Text an einen Server schicken.
 Offline-first komplett: Lernen (Tagesplan, Vorarbeiten, Übungsrunden),
 Aussprache, Decks, Editor, Statistik, Import/Export, PWA.
 
-Offen: **Synchronisierung** zwischen Geräten. Vorgesehen ist ein schlanker
-eigener Endpunkt mit Push/Pull über `updatedAt`. Die Datenschicht ist darauf
-vorbereitet; es kommt nichts dazu, was das Schema ändert.
+Sync zwischen Geräten: fertig, Einrichtung des Servers siehe
+[deploy/README.md](deploy/README.md#sync-server). Modell und Regeln stehen in
+[CLAUDE.md](CLAUDE.md#sync).

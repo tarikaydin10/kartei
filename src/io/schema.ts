@@ -6,7 +6,8 @@
  *   2. Inhalt und Fortschritt getrennt -> ein aktualisiertes Deck überschreibt
  *      Notizen, ohne den Lernfortschritt anzufassen.
  */
-import type { Card, Deck, Note, NoteTypeId, Review } from '@/data/types'
+import type { Card, Deck, Note, Review } from '@/data/types'
+import { inferNoteType, isNoteTypeId } from '@/domain/notetypes'
 
 export const FORMAT = 'kartei'
 export const SCHEMA_VERSION = 1
@@ -31,8 +32,6 @@ export type Parsed =
 function isObj(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
-
-const NOTE_TYPES: NoteTypeId[] = ['ru-vocab', 'basic']
 
 /**
  * Absichtlich nachsichtig: eine handgeschriebene Liste von Notizen oder ein
@@ -74,9 +73,7 @@ export function parseExportFile(raw: unknown): Parsed {
     if (!isObj(n)) continue
     const fields = isObj(n.fields) ? (n.fields as Record<string, string>) : null
     if (!fields) continue
-    const noteTypeId = NOTE_TYPES.includes(n.noteTypeId as NoteTypeId)
-      ? (n.noteTypeId as NoteTypeId)
-      : 'ru-vocab'
+    const noteTypeId = isNoteTypeId(n.noteTypeId) ? n.noteTypeId : inferNoteType(fields)
     notes.push({
       id: typeof n.id === 'string' ? n.id : '',
       createdAt: num(n.createdAt, Date.now()),
@@ -94,19 +91,23 @@ export function parseExportFile(raw: unknown): Parsed {
 
   const decks: Deck[] = (Array.isArray(data.decks) ? data.decks : [])
     .filter(isObj)
-    .map((d, i) => ({
-      id: typeof d.id === 'string' ? d.id : '',
-      createdAt: num(d.createdAt, Date.now()),
-      updatedAt: num(d.updatedAt, Date.now()),
-      deletedAt: typeof d.deletedAt === 'number' ? d.deletedAt : null,
-      name: typeof d.name === 'string' && d.name.trim() ? d.name : `Import ${i + 1}`,
-      emoji: typeof d.emoji === 'string' ? d.emoji : '🗂️',
-      noteTypeId: NOTE_TYPES.includes(d.noteTypeId as NoteTypeId)
-        ? (d.noteTypeId as NoteTypeId)
-        : 'ru-vocab',
-      newPerDay: num(d.newPerDay, 0),
-      sortOrder: num(d.sortOrder, i),
-    }))
+    .map((d, i) => {
+      const id = typeof d.id === 'string' ? d.id : ''
+      return {
+        id,
+        createdAt: num(d.createdAt, Date.now()),
+        updatedAt: num(d.updatedAt, Date.now()),
+        deletedAt: typeof d.deletedAt === 'number' ? d.deletedAt : null,
+        name: typeof d.name === 'string' && d.name.trim() ? d.name : `Import ${i + 1}`,
+        emoji: typeof d.emoji === 'string' ? d.emoji : '🗂️',
+        // Ohne Angabe bestimmen die eigenen Notizen den Typ des Decks.
+        noteTypeId: isNoteTypeId(d.noteTypeId)
+          ? d.noteTypeId
+          : (notes.find((n) => n.deckId === id) ?? notes[0]!).noteTypeId,
+        newPerDay: num(d.newPerDay, 0),
+        sortOrder: num(d.sortOrder, i),
+      }
+    })
 
   const cards = Array.isArray(data.cards) ? (data.cards.filter(isObj) as unknown as Card[]) : undefined
   const reviews = Array.isArray(data.reviews)

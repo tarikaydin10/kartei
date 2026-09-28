@@ -140,7 +140,63 @@ weder Node noch npm.
 dann dasselbe `scripts/deploy.mjs` auf. Schlägt ein Test fehl, wird nicht
 deployt. Solange die Secrets fehlen, wird nur geprüft und gebaut.
 
-Einmalig einrichten:
+### Einrichten ohne SSH (Hetzner-Konsole)
+
+Wenn du gerade nicht per SSH auf den Server kommst: Alles Nötige holt sich der
+Server selbst von GitHub, in der Konsole tippst du genau eine Zeile.
+
+**1. Schlüsselpaar erzeugen** — auf deinem Rechner (PowerShell, Terminal),
+bei der Frage nach der Passphrase zweimal Enter:
+
+```bash
+ssh-keygen -t ed25519 -C github-deploy-kartei -f kartei-deploy
+```
+
+Das ergibt `kartei-deploy` (privat, geheim) und `kartei-deploy.pub`
+(öffentlich, darf ins Repo).
+
+**2. Öffentlichen Schlüssel ins Repo** — Inhalt von `kartei-deploy.pub` als
+`deploy/github-deploy.pub` auf `main` committen (auf GitHub: *Add file →
+Create new file*). Der private Teil kommt nie ins Repo.
+
+**3. In der Hetzner-Konsole** (Cloud Console → Server → `>_` Konsole) als
+`root` anmelden und ausführen:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/tarikaydin10/kartei/main/deploy/bootstrap.sh | bash -s -- --caddy
+```
+
+`deploy/bootstrap.sh` legt den Benutzer `deploy` an, trägt den Schlüssel ein,
+legt `/srv/static/kartei` an, prüft sshd und `ufw`, legt die Caddy-Site ab und
+zeigt am Ende an, was in die Secrets gehört — darunter den Fingerabdruck des
+Servers (`SHA256:…`). Mehrfach ausführen schadet nicht. Ohne `--caddy` bleibt
+die Caddy-Konfiguration unangetastet.
+
+- Kein root-Passwort? Cloud Console → Server → *Rescue* → *Reset root password*.
+- Kommen in der Konsole `/`, `|` oder `-` falsch an, ist sie auf US-Tastatur
+  gestellt: erst `loadkeys de` tippen.
+
+**4. Secrets auf GitHub** (*Settings → Secrets and variables → Actions*):
+
+| Secret                    | Inhalt                                                 |
+| ------------------------- | ------------------------------------------------------ |
+| `DEPLOY_HOST`             | IPv4 des Servers (zeigt das Skript bzw. die Konsole)   |
+| `DEPLOY_USER`             | `deploy`                                               |
+| `DEPLOY_HOST_FINGERPRINT` | `SHA256:…` aus der Ausgabe des Skripts                 |
+| `DEPLOY_SSH_KEY`          | kompletter Inhalt der privaten Datei `kartei-deploy`   |
+
+Statt die lange `known_hosts`-Zeile abzutippen, reicht der Fingerabdruck: Der
+Workflow holt den Hostschlüssel selbst und bricht ab, wenn er nicht passt.
+
+**5. Hetzner Cloud Firewall** (falls eine am Server hängt): eingehend TCP 22
+erlauben. GitHub deployt von wechselnden Adressen; abgesichert ist der Zugang
+über den Schlüssel, nicht über die IP.
+
+**6. Testen:** *Actions → Deploy → Run workflow*. Danach deployt jeder Push
+und jeder Merge auf `main` von selbst. Die lokale Datei `kartei-deploy` kannst
+du löschen, sobald sie als Secret hinterlegt ist.
+
+### Einrichten mit SSH
 
 ```bash
 # 1. Eigenen Schlüssel nur für GitHub erzeugen (ohne Passphrase)
@@ -161,7 +217,7 @@ repository secret** anlegen:
 | `DEPLOY_HOST`        | IPv4 der CX23 (der Alias `kartei-vps` gilt nur lokal)   |
 | `DEPLOY_USER`        | `deploy`                                                |
 | `DEPLOY_SSH_KEY`     | Inhalt von `kartei-deploy` (privater Teil, komplett)    |
-| `DEPLOY_KNOWN_HOSTS` | Ausgabe von `ssh-keyscan` aus Schritt 3                 |
+| `DEPLOY_KNOWN_HOSTS` | Ausgabe von `ssh-keyscan` aus Schritt 3 (oder `DEPLOY_HOST_FINGERPRINT`, siehe oben) |
 | `DEPLOY_PORT`        | optional, nur wenn nicht 22                             |
 | `DEPLOY_ROOT`        | optional, nur wenn nicht `/srv/static/kartei`           |
 
@@ -191,14 +247,69 @@ billiger.
 Aus demselben Grund eine **eigene Subdomain, kein Unterordner**: `start_url`,
 `scope` und der Service Worker gehen von der Wurzel aus.
 
-## Wenn der Sync-Server kommt
+## Sync-Server
 
-In `deploy/kartei.caddy` steckt der Block dafür schon auskommentiert. Dann:
+Damit mehrere Geräte denselben Stand haben, läuft neben den statischen Dateien
+ein kleiner Dienst: `server/` in diesem Repo. Node ohne Pakete, eine
+SQLite-Datei. Er speichert nur verschlüsselte Datensätze; lesen kann er sie
+nicht (der Schlüssel verlässt die Geräte nie).
 
-- ein Node-Prozess (systemd oder Container am `edge`-Netz) auf `127.0.0.1:8788`
-- `handle /api/*` in der Site-Datei aktivieren, **vor** dem catch-all `handle`
-- die Daten außerhalb von `/srv/static/kartei` ablegen, damit ein Deploy sie
-  nicht anfassen kann — wie `/var/lib/ryadom` bei rjadom
+### Einmalig (Variante B, Edge-Caddy)
 
-Die URL bleibt dieselbe. App und API teilen sich die Origin: kein CORS, ein
-Zertifikat, ein Hostname.
+```bash
+# 1. Verzeichnisse: Code für den Build, Daten außerhalb von /srv/static,
+#    damit kein Deploy sie anfasst (1000 = Benutzer `node` im Container)
+ssh root@kartei-vps 'mkdir -p /srv/kartei-sync /var/lib/kartei-sync \
+  && chown deploy:deploy /srv/kartei-sync && chown 1000:1000 /var/lib/kartei-sync'
+
+# 2. Code hochladen (von deinem Rechner aus, im Repo-Verzeichnis)
+scp server/Dockerfile server/store.ts server/app.ts server/main.ts deploy@kartei-vps:/srv/kartei-sync/
+```
+
+In `/srv/edge/docker-compose.yml` den Dienst ergänzen — im selben Compose wie
+der Edge-Caddy, damit er ihn unter `kartei-sync` erreicht:
+
+```yaml
+  kartei-sync:
+    build: /srv/kartei-sync
+    restart: unless-stopped
+    environment:
+      SYNC_MAX_SPACES: "5"   # wie viele Sync-Schlüssel angenommen werden
+    volumes:
+      - /var/lib/kartei-sync:/data
+```
+
+```bash
+cd /srv/edge && docker compose up -d --build kartei-sync
+
+# 3. Site-Datei mit dem /api-Block übernehmen und neu laden
+cp deploy/kartei.caddy /srv/edge/conf.d/kartei.caddy
+docker exec edge-caddy caddy reload --config /etc/caddy/Caddyfile
+
+# Prüfen
+curl https://kartei.klick-profi.de/api/sync/health   # {"ok":true}
+```
+
+Variante A (Caddy auf dem Host): denselben Container mit `-p 127.0.0.1:8788:8788`
+starten und in `kartei.caddy` `reverse_proxy 127.0.0.1:8788` eintragen.
+
+### Aktualisieren
+
+Der Server ändert sich selten und wird nicht automatisch deployt:
+
+```bash
+scp server/Dockerfile server/store.ts server/app.ts server/main.ts deploy@kartei-vps:/srv/kartei-sync/
+ssh root@kartei-vps 'cd /srv/edge && docker compose up -d --build kartei-sync'
+```
+
+### Sichern
+
+Alles liegt in `/var/lib/kartei-sync/kartei-sync.db` (plus `-wal`/`-shm`
+während des Betriebs). Ein Backup ist optional: Jedes verbundene Gerät hat den
+vollständigen Bestand und lädt ihn in einen leeren Server wieder hoch.
+
+`SYNC_MAX_SPACES` begrenzt, wie viele verschiedene Sync-Schlüssel der Server
+annimmt — Fremde können ihn so nicht als Speicher missbrauchen. Für dich allein
+reicht 1; ein paar mehr erlauben einen Neuanfang mit neuem Schlüssel.
+
+App und API teilen sich die Origin: kein CORS, ein Zertifikat, ein Hostname.

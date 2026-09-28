@@ -20,7 +20,7 @@ export interface SyncMeta {
   deletedAt: number | null
 }
 
-export type NoteTypeId = 'ru-vocab' | 'basic'
+export type NoteTypeId = 'ru-vocab' | 'concept' | 'basic'
 
 export interface Deck extends SyncMeta {
   name: string
@@ -83,6 +83,17 @@ export interface Review {
    * Fehlt bei allen älteren Reviews, dort also immer planungswirksam.
    */
   practice?: boolean
+}
+
+/**
+ * Sync-Buchführung, nur lokal: Schlüssel `<collection>/<id>`, Wert die Version
+ * (`updatedAt`, bei Reviews `ts`), die der Server zuletzt bestätigt hat.
+ * Weicht der Datensatz davon ab, ist er zu senden; fehlt ein Review, das hier
+ * steht, wurde es zurückgenommen — dann geht ein Löschmarker raus.
+ */
+export interface SyncedVersion {
+  k: string
+  u: number
 }
 
 export interface StoredSetting {

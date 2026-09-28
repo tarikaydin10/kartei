@@ -122,6 +122,47 @@ export function deriveRating(
   return 3
 }
 
+/**
+ * Selbstbewertung nach dem Aufdecken — für Karten, deren Antwort sich nicht
+ * zeichenweise prüfen lässt (`grading: 'self'`). Drei Stufen statt vier:
+ * „Leicht“ ist beim Selbsteinschätzen kaum von „Gut“ zu trennen und verleitet
+ * dazu, sich zu überschätzen.
+ */
+export type SelfGrade = 'again' | 'hard' | 'good'
+
+export const SELF_GRADES: SelfGrade[] = ['again', 'hard', 'good']
+
+export const SELF_GRADE_LABEL: Record<SelfGrade, string> = {
+  again: 'Nicht gewusst',
+  hard: 'Mühsam',
+  good: 'Gewusst',
+}
+
+export function selfRating(grade: SelfGrade): Rating {
+  if (grade === 'again') return 1
+  if (grade === 'hard') return 2
+  return 3
+}
+
+/**
+ * Wie die Selbstbewertung in der Session zählt — dieselben drei Ausgänge wie
+ * bei getippten Antworten, damit Trefferquote und „Fehler üben“ gleich bleiben.
+ */
+export function selfOutcome(grade: SelfGrade): 'correct' | 'near' | 'wrong' {
+  if (grade === 'again') return 'wrong'
+  if (grade === 'hard') return 'near'
+  return 'correct'
+}
+
+/**
+ * „Ich hatte recht“: die Prüfung hat eine richtige Antwort verworfen, etwa ein
+ * Synonym, das nicht in der Liste steht. Zählt als „Gut“, nie als „Leicht“ —
+ * und mit Hinweis wie sonst auch höchstens als „Schwer“.
+ */
+export function overruleRating(hintUsed: boolean): Rating {
+  return hintUsed ? 2 : 3
+}
+
 export function fastThreshold(answerLength: number): number {
   return Math.min(8000, 1200 + 200 * Math.max(1, answerLength))
 }

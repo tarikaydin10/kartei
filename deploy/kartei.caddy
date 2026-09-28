@@ -1,9 +1,9 @@
 # Nach /srv/edge/conf.d/kartei.caddy kopieren (Variante B) bzw. nach
 # /etc/caddy/conf.d/ (Variante A). Siehe deploy/README.md.
 #
-# Kartei ist (noch) rein statisch — es läuft kein Prozess dafür. Caddy liefert
-# die Dateien direkt aus, ein Deploy ist ein Symlink-Wechsel. Kein Container,
-# kein Neustart, kein Reload.
+# Die App ist statisch — Caddy liefert die Dateien direkt aus, ein Deploy ist
+# ein Symlink-Wechsel. Einzig /api/* geht an den Sync-Server (Container
+# `kartei-sync`, siehe deploy/README.md).
 #
 # Eigene Subdomain, kein Unterordner: das Manifest hat `start_url: "/"` und
 # `scope: "/"`, und der Service Worker beansprucht die ganze Origin.
@@ -31,12 +31,16 @@ kartei.klick-profi.de {
 	@entry path / /index.html /sw.js /registerSW.js /manifest.webmanifest
 	header @entry Cache-Control "no-cache"
 
-	# Wenn der Sync-Server kommt, kommt er hierhin — gleiche Origin, kein CORS,
-	# dieselbe URL. Dieser Block muss VOR dem catch-all `handle` stehen.
-	#
-	# handle /api/* {
-	# 	reverse_proxy kartei-sync:8788
-	# }
+	# Sync-Server — gleiche Origin, kein CORS, dieselbe URL. Dieser Block muss
+	# VOR dem catch-all `handle` stehen. Läuft der Container nicht, antwortet
+	# /api mit 502; die App lernt offline weiter und zeigt den Sync als gestört.
+	handle /api/* {
+		request_body {
+			max_size 16MB
+		}
+		header Cache-Control "no-store"
+		reverse_proxy kartei-sync:8788
+	}
 
 	handle {
 		# Eine Single-Page-App: unbekannte Pfade liefern index.html, damit ein

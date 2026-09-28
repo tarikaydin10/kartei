@@ -4,10 +4,15 @@
  * dieselbe Schnittstelle, ohne dass ein einziges Component angefasst wird.
  *
  * Jede Schreiboperation stempelt `updatedAt`. Gelöscht wird ausschließlich
- * weich (`deletedAt`), damit Löschungen später synchronisierbar sind.
+ * weich (`deletedAt`), damit Löschungen synchronisierbar sind.
+ *
+ * Ausnahme Karten: Ihr `updatedAt` stempelt nur Änderungen an dem, was
+ * synchronisiert wird (Deck, Pausiert, Gelöscht). Der FSRS-Zustand ist Cache,
+ * wird auf jedem Gerät aus dem Review-Log berechnet und zählt nicht als
+ * Änderung — sonst überschriebe jede Antwort ein „Pausiert“ vom anderen Gerät.
  */
 import { db } from './db'
-import { newId } from '@/lib/id'
+import { cardIdFor, newId } from '@/lib/id'
 import { dayKey, startOfDay } from '@/lib/date'
 import { defaultTemplateIds, noteType } from '@/domain/notetypes'
 import { applyRating, initialState, replay, type SrsState } from '@/domain/srs'
@@ -49,6 +54,9 @@ export function cardState(card: Card): SrsState {
 /* ------------------------------------------------------------------ *
  * Einstellungen
  * ------------------------------------------------------------------ */
+
+/** Gesetzt, sobald dieses Gerät mit einem Sync verbunden ist (siehe sync.ts). */
+export const SYNC_KEY_SETTING = 'sync.key'
 
 /** Reiner Lesezugriff — damit der Aufruf in einer liveQuery nichts schreibt. */
 export async function loadSettings(): Promise<AppSettings> {
@@ -138,13 +146,17 @@ export async function reorderDecks(idsInOrder: ID[]): Promise<void> {
  * steht. Prüfen und Anlegen müssen in *einer* Transaktion passieren — sonst
  * legen zwei parallele Aufrufe (React StrictMode, zwei offene Tabs) zwei Decks
  * an.
+ *
+ * Mit eingerichtetem Sync nicht: Die Decks kommen dann vom Server, und ein
+ * frisch angelegtes leeres Deck landete als Doppel auf allen Geräten.
  */
-export async function ensureSeed(): Promise<Deck> {
-  return db.transaction('rw', db.decks, async () => {
+export async function ensureSeed(): Promise<Deck | undefined> {
+  return db.transaction('rw', db.decks, db.settings, async () => {
     const existing = live(await db.decks.toArray())
     if (existing.length > 0) {
       return existing.sort((a, b) => a.sortOrder - b.sortOrder)[0]!
     }
+    if ((await db.settings.get(SYNC_KEY_SETTING))?.value) return undefined
     const now = Date.now()
     const deck: Deck = {
       id: newId(),
@@ -234,6 +246,12 @@ export async function updateNote(
       await db.cards.bulkPut(cards.map((c) => ({ ...c, deckId: patch.deckId!, updatedAt: now })))
     }
     if (patch.templateIds) await reconcileCards(next, patch.templateIds, now)
+
+    // Bearbeiten bestätigt die Karten der Notiz. Hat ein anderes Gerät die
+    // Notiz inzwischen gelöscht, gewinnt beim Sync die spätere Bearbeitung —
+    // und mit diesem Stempel auch ihre Karten, statt einer Notiz ohne Karten.
+    const cards = await db.cards.where('noteId').equals(id).toArray()
+    await db.cards.bulkPut(cards.filter((c) => !c.deletedAt).map((c) => ({ ...c, updatedAt: now })))
   })
 }
 
@@ -307,7 +325,7 @@ async function reconcileCards(note: Note, templateIds: string[], now: number): P
     const found = byTemplate.get(templateId)
     if (!found) {
       await db.cards.add({
-        id: newId(),
+        id: cardIdFor(note.id, templateId),
         createdAt: now,
         updatedAt: now,
         deletedAt: null,
@@ -505,10 +523,12 @@ export async function recordReview(input: ReviewInput, now = Date.now()): Promis
     })
     return card
   }
-  const next = applyRating(cardState(card), rating, now)
-  const updated: Card = { ...card, ...next, updatedAt: now }
-
-  await db.transaction('rw', db.cards, db.reviews, async () => {
+  return db.transaction('rw', db.cards, db.reviews, async () => {
+    // Vom gespeicherten Stand aus rechnen, nicht von der Kopie der Session:
+    // ein Sync kann die Karte zwischendurch aus dem Log neu berechnet haben.
+    const current = (await db.cards.get(card.id)) ?? card
+    // Kein neues `updatedAt`: der FSRS-Zustand ist Cache (siehe Kopf der Datei).
+    const updated: Card = { ...current, ...applyRating(cardState(current), rating, now) }
     await db.cards.put(updated)
     await db.reviews.add({
       id: newId(),
@@ -520,11 +540,11 @@ export async function recordReview(input: ReviewInput, now = Date.now()): Promis
       durationMs: Math.max(0, Math.round(input.durationMs)),
       typed: input.typed,
       verdict: input.verdict,
-      wasNew: card.state === 0,
+      wasNew: current.state === 0,
       deviceId: input.deviceId,
     })
+    return updated
   })
-  return updated
 }
 
 /**
@@ -532,8 +552,9 @@ export async function recordReview(input: ReviewInput, now = Date.now()): Promis
  * Log neu berechnen.
  *
  * Bewusste Ausnahme von „Reviews sind unveränderlich“: das passiert Sekunden
- * nach der Eingabe, lange vor jedem Sync. Ein Verkliker ohne Ausweg kostet
- * mehr Vertrauen als diese Ausnahme.
+ * nach der Eingabe. Ein Verkliker ohne Ausweg kostet mehr Vertrauen als diese
+ * Ausnahme. War die Antwort schon synchronisiert, bemerkt der nächste Sync das
+ * Fehlen und verteilt einen Löschmarker (`data/sync.ts`).
  */
 export async function undoLastReview(cardId: ID): Promise<Card | undefined> {
   return db.transaction('rw', db.cards, db.reviews, async () => {
@@ -545,9 +566,39 @@ export async function undoLastReview(cardId: ID): Promise<Card | undefined> {
     const last = reviews.pop()!
     await db.reviews.delete(last.id)
     const state = replay(card.createdAt, reviews)
-    const restored: Card = { ...card, ...state, updatedAt: Date.now() }
+    const restored: Card = { ...card, ...state }
     await db.cards.put(restored)
     return restored
+  })
+}
+
+/**
+ * Letzte Antwort einer Karte umbewerten („Ich hatte recht“) und den Zustand aus
+ * dem Log neu berechnen. Die Antwort behält Zeitpunkt, Eingabe und Übungsflag;
+ * nur Bewertung und Urteil ändern sich.
+ *
+ * Zweite bewusste Ausnahme von „Reviews sind unveränderlich“, aus demselben
+ * Grund wie `undoLastReview` und mit demselben Weg in den Sync. Das Review
+ * bekommt eine neue ID — ein anderes Urteil ist ein anderes Ereignis.
+ */
+export async function amendLastReview(
+  cardId: ID,
+  change: { rating: Rating; verdict: Review['verdict'] },
+): Promise<Card | undefined> {
+  return db.transaction('rw', db.cards, db.reviews, async () => {
+    const card = await db.cards.get(cardId)
+    if (!card) return undefined
+    const reviews = await db.reviews.where('cardId').equals(cardId).toArray()
+    if (reviews.length === 0) return card
+    reviews.sort((a, b) => a.ts - b.ts)
+    const last = reviews.pop()!
+    const amended: Review = { ...last, id: newId(), rating: change.rating, verdict: change.verdict }
+    await db.reviews.delete(last.id)
+    await db.reviews.add(amended)
+    const state = replay(card.createdAt, [...reviews, amended])
+    const updated: Card = { ...card, ...state }
+    await db.cards.put(updated)
+    return updated
   })
 }
 

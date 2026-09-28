@@ -38,9 +38,15 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,json}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
+        // Der Sync-Server liegt unter derselben Origin — nie aus dem Cache.
+        navigateFallbackDenylist: [/^\/api\//],
       },
     }),
   ],
+  // `node server/main.ts` im zweiten Terminal, dann synchronisiert auch der Dev-Server.
+  server: {
+    proxy: { '/api': 'http://localhost:8788' },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

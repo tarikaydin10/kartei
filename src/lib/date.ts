@@ -61,3 +61,13 @@ export function formatDay(key: string): string {
   const d = new Date(`${key}T00:00:00`)
   return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' })
 }
+
+/** „gerade eben“, „vor 5 Minuten“, „gestern“ — für Zeitpunkte in der Vergangenheit. */
+export function agoLabel(ts: number, now = Date.now()): string {
+  const mins = Math.round((now - ts) / 60_000)
+  if (mins < 1) return 'gerade eben'
+  if (mins < 60) return RTF.format(-mins, 'minute')
+  const days = daysBetween(dayKey(ts), dayKey(now))
+  if (days === 0) return RTF.format(-Math.round(mins / 60), 'hour')
+  return RTF.format(-days, 'day')
+}

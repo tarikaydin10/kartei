@@ -2,6 +2,16 @@ import type { NoteTypeId } from '@/data/types'
 
 export type Lang = 'ru' | 'de'
 
+/**
+ * Wie eine Antwort bewertet wird.
+ *   `typed` — getippt und zeichenweise geprüft. Für kurze, eindeutige Antworten
+ *             (Vokabeln), die Bewertung ergibt sich aus der Eingabe.
+ *   `self`  — aufdecken und selbst einschätzen. Für Wissen, das sich in eigenen
+ *             Worten richtig beantworten lässt und an keinem Zeichenvergleich
+ *             hängen darf (Konzepte, Regeln, Zusammenhänge).
+ */
+export type Grading = 'typed' | 'self'
+
 export interface FieldDef {
   key: string
   label: string
@@ -31,6 +41,7 @@ export interface TemplateDef {
   /** Felder, die nach dem Auflösen als Kontext gezeigt werden. */
   revealFields: string[]
   byDefault: boolean
+  grading: Grading
 }
 
 export interface NoteTypeDef {
@@ -106,6 +117,7 @@ const RU_VOCAB: NoteTypeDef = {
       inputLang: 'de',
       revealFields: ['grammatik', 'beispielRu', 'beispielDe', 'notiz'],
       byDefault: true,
+      grading: 'typed',
     },
     {
       id: 'de2ru',
@@ -116,6 +128,7 @@ const RU_VOCAB: NoteTypeDef = {
       inputLang: 'ru',
       revealFields: ['grammatik', 'beispielRu', 'beispielDe', 'notiz'],
       byDefault: true,
+      grading: 'typed',
     },
   ],
 }
@@ -149,6 +162,7 @@ const BASIC: NoteTypeDef = {
       inputLang: 'de',
       revealFields: ['notiz'],
       byDefault: true,
+      grading: 'typed',
     },
     {
       id: 'h2v',
@@ -159,16 +173,84 @@ const BASIC: NoteTypeDef = {
       inputLang: 'de',
       revealFields: ['notiz'],
       byDefault: false,
+      grading: 'typed',
+    },
+  ],
+}
+
+const CONCEPT: NoteTypeDef = {
+  id: 'concept',
+  name: 'Konzept',
+  description:
+    'Frage und Antwort in eigenen Worten — aufdecken und selbst bewerten. Für Regeln, Architektur, Zusammenhänge.',
+  identityField: 'frage',
+  primaryField: 'frage',
+  secondaryField: 'antwort',
+  fields: [
+    {
+      key: 'frage',
+      label: 'Frage',
+      lang: 'de',
+      required: true,
+      multiline: true,
+      placeholder: 'Warum spricht die UI nie direkt mit der Datenbank?',
+    },
+    {
+      key: 'antwort',
+      label: 'Antwort',
+      lang: 'de',
+      required: true,
+      multiline: true,
+      placeholder: 'Damit ein Sync-Backend hinter dieselbe Schnittstelle passt.',
+      hint: 'Der Kern in ein, zwei Sätzen. Verglichen wird von dir, nicht Zeichen für Zeichen.',
+    },
+    {
+      key: 'erklaerung',
+      label: 'Erklärung',
+      lang: 'de',
+      multiline: true,
+      hint: 'Hintergrund, Beispiel, Ausnahme — erscheint nach dem Aufdecken.',
+    },
+    { key: 'quelle', label: 'Quelle', lang: 'de', placeholder: 'ADR-007, CLAUDE.md …' },
+  ],
+  templates: [
+    {
+      id: 'q2a',
+      label: 'Frage → Antwort',
+      short: 'F→A',
+      promptField: 'frage',
+      answerField: 'antwort',
+      inputLang: 'de',
+      revealFields: ['erklaerung', 'quelle'],
+      byDefault: true,
+      grading: 'self',
     },
   ],
 }
 
 export const NOTE_TYPES: Record<NoteTypeId, NoteTypeDef> = {
   'ru-vocab': RU_VOCAB,
+  concept: CONCEPT,
   basic: BASIC,
 }
 
-export const NOTE_TYPE_LIST: NoteTypeDef[] = [RU_VOCAB, BASIC]
+export const NOTE_TYPE_LIST: NoteTypeDef[] = [RU_VOCAB, CONCEPT, BASIC]
+
+export function isNoteTypeId(v: unknown): v is NoteTypeId {
+  return typeof v === 'string' && Object.hasOwn(NOTE_TYPES, v)
+}
+
+/**
+ * Notiztyp einer handgeschriebenen Notiz ohne `noteTypeId`: der erste Typ,
+ * dessen Pflichtfelder alle als Schlüssel vorkommen. Sonst Russisch — das
+ * war vor dieser Regel die einzige Annahme und bleibt der Rückfall.
+ */
+export function inferNoteType(fields: Record<string, unknown>): NoteTypeId {
+  const match = NOTE_TYPE_LIST.find((t) =>
+    t.fields.filter((f) => f.required).every((f) => Object.hasOwn(fields, f.key)),
+  )
+  return match?.id ?? 'ru-vocab'
+}
 
 export function noteType(id: NoteTypeId): NoteTypeDef {
   return NOTE_TYPES[id] ?? BASIC

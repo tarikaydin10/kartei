@@ -23,6 +23,7 @@ import { SegmentedControl, Stepper, Switch } from '@/ui/Field'
 import { ConfirmSheet, Sheet } from '@/ui/Sheet'
 import { useToast } from '@/ui/Toast'
 import { CsvImportSheet } from './CsvImport'
+import { SyncPanel } from './SyncPanel'
 
 export function DataScreen({ settings }: { settings: AppSettings }) {
   const toast = useToast()
@@ -167,6 +168,8 @@ export function DataScreen({ settings }: { settings: AppSettings }) {
           : 'Noch kein Backup gemacht.'}{' '}
         · {sums.notes} Notizen, {sums.cards} Karten
       </p>
+
+      <SyncPanel />
 
       {/* Importieren */}
       <div className="mt-6">
