@@ -20,7 +20,7 @@ export interface SyncMeta {
   deletedAt: number | null
 }
 
-export type NoteTypeId = 'ru-vocab' | 'basic'
+export type NoteTypeId = 'ru-vocab' | 'concept' | 'basic'
 
 export interface Deck extends SyncMeta {
   name: string

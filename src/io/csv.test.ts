@@ -78,6 +78,15 @@ describe('guessMapping', () => {
     expect(m.notiz).toBe(-1)
   })
 
+  it('ordnet Konzept-Spalten über die Kopfzeile zu', () => {
+    const m = guessMapping(
+      ['Frage', 'Antwort', 'Erklärung', 'Quelle'],
+      ['frage', 'antwort', 'erklaerung', 'quelle'],
+      4,
+    )
+    expect(m).toEqual({ frage: 0, antwort: 1, erklaerung: 2, quelle: 3 })
+  })
+
   it('ordnet ohne Kopfzeile die ersten zwei Spalten zu', () => {
     const m = guessMapping(['стол', 'Tisch'], ['ru', 'de', 'notiz'], 2)
     expect(m.ru).toBe(0)

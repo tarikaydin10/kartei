@@ -7,6 +7,11 @@ her aber für jedes Thema gebaut.
   Netzabhängigkeit.
 - **Tippen statt Umdrehen.** Antworten werden geschrieben und zeichenweise
   geprüft — mit ЙЦУКЕН-Bildschirmtastatur für Kyrillisch.
+- **Selbstbewertung für Wissen.** Der Kartentyp „Konzept“ (Frage, Antwort,
+  Erklärung, Quelle) wird nicht zeichenweise geprüft: erst selbst formulieren,
+  dann aufdecken und mit *Nicht gewusst / Mühsam / Gewusst* bewerten — für
+  Regeln, Architektur und alles, was sich in eigenen Worten richtig beantworten
+  lässt.
 - **FSRS.** Wiederholungsplanung über [`ts-fsrs`](https://github.com/open-spaced-repetition/ts-fsrs),
   denselben Algorithmus, den auch Anki verwendet.
 - **Mehr als der Tagesplan.** Vorarbeiten, zusätzliche neue Karten, heute

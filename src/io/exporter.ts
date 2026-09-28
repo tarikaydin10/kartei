@@ -57,8 +57,15 @@ export async function buildCsv(deckIds?: ID[] | null): Promise<string> {
   )
   if (notes.length === 0) return ''
 
-  const type = noteType(notes[0]!.noteTypeId)
-  const keys = type.fields.map((f) => f.key)
+  // Mehrere Kartentypen in einer Datei: alle Felder als Spalten, in der
+  // Reihenfolge ihres ersten Auftretens — sonst fielen fremde Felder weg.
+  const keys = [
+    ...new Set(
+      [...new Set(notes.map((n) => n.noteTypeId))].flatMap((id) =>
+        noteType(id).fields.map((f) => f.key),
+      ),
+    ),
+  ]
   const rows: string[][] = [[...keys, 'tags']]
   for (const n of notes) {
     rows.push([...keys.map((k) => n.fields[k] ?? ''), n.tags.join(' ')])

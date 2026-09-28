@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { applyRating, deriveRating, fastThreshold, initialState, previewDue, replay } from './srs'
+import {
+  SELF_GRADES,
+  applyRating,
+  deriveRating,
+  fastThreshold,
+  initialState,
+  previewDue,
+  replay,
+  selfOutcome,
+  selfRating,
+} from './srs'
 import type { Rating, Review } from '@/data/types'
 
 const T0 = Date.parse('2026-09-20T09:00:00Z')
@@ -129,5 +139,17 @@ describe('deriveRating', () => {
   it('gibt langen Antworten mehr Zeit', () => {
     expect(fastThreshold(3)).toBeLessThan(fastThreshold(20))
     expect(fastThreshold(100)).toBeLessThanOrEqual(8000)
+  })
+})
+
+describe('Selbstbewertung', () => {
+  it('bildet drei Stufen auf Nochmal, Schwer und Gut ab — nie auf Leicht', () => {
+    expect(SELF_GRADES.map(selfRating)).toEqual([1, 2, 3])
+  })
+
+  it('zählt in der Session wie eine getippte Antwort', () => {
+    expect(selfOutcome('again')).toBe('wrong')
+    expect(selfOutcome('hard')).toBe('near')
+    expect(selfOutcome('good')).toBe('correct')
   })
 })

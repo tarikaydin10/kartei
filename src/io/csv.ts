@@ -109,6 +109,10 @@ const HEADER_HINTS: Record<string, string[]> = {
   beispielRu: ['beispiel ru', 'beispielru', 'example ru', 'пример', 'satz'],
   beispielDe: ['beispiel de', 'beispielde', 'example de', 'beispiel übersetzung'],
   notiz: ['notiz', 'note', 'notes', 'kommentar', 'примечание'],
+  frage: ['frage', 'question', 'front', 'vorne'],
+  antwort: ['antwort', 'answer', 'back', 'hinten'],
+  erklaerung: ['erklärung', 'erklaerung', 'explanation', 'begründung', 'warum'],
+  quelle: ['quelle', 'source', 'referenz', 'reference'],
   tags: ['tags', 'tag', 'kategorie', 'kategorien'],
 }
 

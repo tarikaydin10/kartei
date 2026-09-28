@@ -89,6 +89,9 @@ scripts/        make-starter.mjs, make-icons.mjs, deploy.mjs
   `pronounce: true` an einem Feld schaltet die Lautschrift dafür ein,
   `pronounce: 'inline'` bei Mischtext (Grammatik) nur für die russischen
   Stellen, jeweils direkt dahinter (`annotate`).
+  `grading` an der Vorlage entscheidet über die Bewertung: `typed` wird
+  getippt und zeichenweise geprüft (Vokabeln), `self` wird aufgedeckt und
+  selbst bewertet (`concept`: Regeln, Architektur, Zusammenhänge).
 - **Neuer Lernmodus** = ein Eintrag in `STUDY_MODES` und ein Fall in
   `pickCards` (`domain/session.ts`). `practice: true` heißt: ins Log, nicht
   in die Planung.
